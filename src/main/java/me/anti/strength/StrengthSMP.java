@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemMeta;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class StrengthSMP extends JavaPlugin implements Listener {
@@ -61,12 +62,12 @@ public class StrengthSMP extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
 
-        if (item == null || item.getType() != Material.BOOK) return;
+        if (item == null || item.getType() != Material.KNOWLEDGE_BOOK) return;
 
         if (!item.hasItemMeta()) return;
         if (!item.getItemMeta().hasDisplayName()) return;
 
-        if (!item.getItemMeta().getDisplayName().equals(ChatColor.LIGHT_PURPLE + "Reroll Book"))
+        if (!item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Reroll Guide"))
             return;
 
         event.setCancelled(true);
@@ -77,6 +78,9 @@ public class StrengthSMP extends JavaPlugin implements Listener {
         setClass(player, rolledClass);
 
         item.setAmount(item.getAmount() - 1);
+
+        player.playSound(player.getLocation(), "minecraft:item.book.page_turn", 1f, 1f);
+        player.playSound(player.getLocation(), "minecraft:block.enchantment_table.use", 0.5f, 1.2f);
 
         player.sendMessage(ChatColor.GOLD + "You rolled: " + ChatColor.YELLOW + rolledClass.toUpperCase());
     }
@@ -97,28 +101,34 @@ public class StrengthSMP extends JavaPlugin implements Listener {
     }
 
     // ===== REROLL RECIPE =====
-   private void setupRerollRecipe() {
+    private void setupRerollRecipe() {
 
-    ItemStack reroll = new ItemStack(Material.BOOK);
-    ItemMeta meta = reroll.getItemMeta();
-    meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Reroll Book");
-    reroll.setItemMeta(meta);
+        ItemStack reroll = new ItemStack(Material.KNOWLEDGE_BOOK);
+        ItemMeta meta = reroll.getItemMeta();
 
-    NamespacedKey key = new NamespacedKey(this, "reroll_book");
+        meta.setDisplayName(ChatColor.GREEN + "Reroll Guide");
 
-    ShapedRecipe recipe = new ShapedRecipe(key, reroll);
+        meta.setLore(Arrays.asList(
+                ChatColor.GRAY + "Right-click to reroll your class",
+                ChatColor.DARK_GRAY + "Consumes on use"
+        ));
 
-    recipe.shape(
-            "I G I",
-            "G D G",
-            "I G I"
+        reroll.setItemMeta(meta);
 
-    );
+        NamespacedKey key = new NamespacedKey(this, "reroll_book");
 
-    recipe.setIngredient('I', Material.IRON_BLOCK);
-    recipe.setIngredient('G', Material.GOLD_BLOCK);
-    recipe.setIngredient('D', Material.DIAMOND_BLOCK); // not used in this version but kept for safety
+        ShapedRecipe recipe = new ShapedRecipe(key, reroll);
 
-    Bukkit.addRecipe(recipe);
-  }
+        recipe.shape(
+                "IGI",
+                "GDG",
+                "IGI"
+        );
+
+        recipe.setIngredient('I', Material.IRON_BLOCK);
+        recipe.setIngredient('G', Material.GOLD_BLOCK);
+        recipe.setIngredient('D', Material.DIAMOND_BLOCK);
+
+        Bukkit.addRecipe(recipe);
+    }
 }
