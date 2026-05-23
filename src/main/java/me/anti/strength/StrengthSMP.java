@@ -4,12 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
@@ -22,7 +19,6 @@ import java.util.Random;
 
 public class StrengthSMP extends JavaPlugin implements Listener {
 
-    // ===== CLASSES =====
     private final String[] CLASSES = {
             "sword",
             "axe",
@@ -35,28 +31,33 @@ public class StrengthSMP extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
-
-        getLogger().info("StrengthSMP enabled");
-
         setupRerollRecipe();
-
         saveDefaultConfig();
     }
 
-    // ===== PLAYER JOIN =====
+    // ===== JOIN MESSAGE (CHAT ONLY) =====
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         String uuid = player.getUniqueId().toString();
 
-        if (getConfig().get(uuid + ".class") == null) {
+        if (!getConfig().isSet(uuid + ".class")) {
             getConfig().set(uuid + ".class", "none");
             getConfig().set(uuid + ".strength", 0);
             saveConfig();
         }
+
+        String clazz = getConfig().getString(uuid + ".class", "none");
+        int strength = getConfig().getInt(uuid + ".strength", 0);
+
+        player.sendMessage(ChatColor.GREEN + "====================");
+        player.sendMessage(ChatColor.GOLD + "Strength: " + ChatColor.YELLOW + strength + "+");
+        player.sendMessage(ChatColor.GOLD + "Class: " + ChatColor.YELLOW + clazz.toUpperCase());
+        player.sendMessage(ChatColor.GOLD + "Weapon: " + ChatColor.YELLOW + clazz.toUpperCase());
+        player.sendMessage(ChatColor.GREEN + "====================");
     }
 
-    // ===== REROLL BOOK INTERACTION =====
+    // ===== REROLL USE =====
     @EventHandler
     public void onUse(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -65,39 +66,23 @@ public class StrengthSMP extends JavaPlugin implements Listener {
         if (item == null || item.getType() != Material.KNOWLEDGE_BOOK) return;
 
         if (!item.hasItemMeta()) return;
-        if (!item.getItemMeta().hasDisplayName()) return;
 
-        if (!item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Reroll Guide"))
-            return;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null || !meta.hasDisplayName()) return;
+
+        if (!meta.getDisplayName().equals(ChatColor.GREEN + "Reroll Guide")) return;
 
         event.setCancelled(true);
 
         Random random = new Random();
-        String rolledClass = CLASSES[random.nextInt(CLASSES.length)];
+        String rolled = CLASSES[random.nextInt(CLASSES.length)];
 
-        setClass(player, rolledClass);
+        getConfig().set(player.getUniqueId().toString() + ".class", rolled);
+        saveConfig();
 
         item.setAmount(item.getAmount() - 1);
 
-        player.playSound(player.getLocation(), "minecraft:item.book.page_turn", 1f, 1f);
-        player.playSound(player.getLocation(), "minecraft:block.enchantment_table.use", 0.5f, 1.2f);
-
-        player.sendMessage(ChatColor.GOLD + "You rolled: " + ChatColor.YELLOW + rolledClass.toUpperCase());
-    }
-
-    // ===== CLASS SYSTEM =====
-    private void setClass(Player player, String clazz) {
-        String uuid = player.getUniqueId().toString();
-        getConfig().set(uuid + ".class", clazz);
-        saveConfig();
-    }
-
-    private String getClass(Player player) {
-        return getConfig().getString(player.getUniqueId().toString() + ".class", "none");
-    }
-
-    private int getStrength(Player player) {
-        return getConfig().getInt(player.getUniqueId().toString() + ".strength", 0);
+        player.sendMessage(ChatColor.GOLD + "You rolled: " + ChatColor.YELLOW + rolled.toUpperCase());
     }
 
     // ===== REROLL RECIPE =====
@@ -107,7 +92,6 @@ public class StrengthSMP extends JavaPlugin implements Listener {
         ItemMeta meta = reroll.getItemMeta();
 
         meta.setDisplayName(ChatColor.GREEN + "Reroll Guide");
-
         meta.setLore(Arrays.asList(
                 ChatColor.GRAY + "Right-click to reroll your class",
                 ChatColor.DARK_GRAY + "Consumes on use"
