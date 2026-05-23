@@ -7,9 +7,6 @@
     <groupId>me.anti</groupId>
     <artifactId>StrengthSMP</artifactId>
     <version>1.0</version>
-    <packaging>jar</packaging>
-
-    <name>StrengthSMP</name>
 
     <properties>
         <java.version>21</java.version>
