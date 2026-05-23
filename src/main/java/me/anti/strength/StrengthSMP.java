@@ -10,6 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerJoinEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -21,6 +22,10 @@ public class StrengthSMP extends JavaPlugin implements Listener {
 
     private FileConfiguration config;
 
+    private final int MAX_STRENGTH = 5;
+    private final int DEFAULT_STRENGTH = 3;
+    private final int MIN_STRENGTH = -3;
+
     @Override
     public void onEnable() {
 
@@ -31,6 +36,35 @@ public class StrengthSMP extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(this, this);
 
         getLogger().info("StrengthSMP enabled");
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+
+        Player player = event.getPlayer();
+
+        String uuid = player.getUniqueId().toString();
+
+        if (!config.contains(uuid)) {
+
+            config.set(uuid, DEFAULT_STRENGTH);
+
+            saveConfig();
+
+            updateDamage(player, DEFAULT_STRENGTH);
+
+            player.sendMessage(
+                    ChatColor.GREEN +
+                    "Your starting strength is " +
+                    DEFAULT_STRENGTH
+            );
+        }
+        else {
+
+            int strength = config.getInt(uuid);
+
+            updateDamage(player, strength);
+        }
     }
 
     @EventHandler
@@ -78,8 +112,8 @@ public class StrengthSMP extends JavaPlugin implements Listener {
 
         strength += amount;
 
-        if (strength > 10) {
-            strength = 10;
+        if (strength > MAX_STRENGTH) {
+            strength = MAX_STRENGTH;
         }
 
         config.set(player.getUniqueId().toString(), strength);
@@ -97,8 +131,8 @@ public class StrengthSMP extends JavaPlugin implements Listener {
 
         strength -= amount;
 
-        if (strength < 0) {
-            strength = 0;
+        if (strength < MIN_STRENGTH) {
+            strength = MIN_STRENGTH;
         }
 
         config.set(player.getUniqueId().toString(), strength);
@@ -136,8 +170,8 @@ public class StrengthSMP extends JavaPlugin implements Listener {
 
             player.sendMessage(
                     ChatColor.GOLD +
-                            "Strength: " +
-                            strength
+                    "Strength: " +
+                    strength
             );
 
             return true;
@@ -147,7 +181,7 @@ public class StrengthSMP extends JavaPlugin implements Listener {
 
             int strength = config.getInt(player.getUniqueId().toString());
 
-            if (strength <= 0) {
+            if (strength <= MIN_STRENGTH) {
                 player.sendMessage(ChatColor.RED + "No strength to withdraw");
                 return true;
             }
