@@ -1,6 +1,5 @@
 package me.anti.strength;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -20,12 +19,7 @@ import java.util.Random;
 public class StrengthSMP extends JavaPlugin implements Listener {
 
     private final String[] CLASSES = {
-            "sword",
-            "axe",
-            "trident",
-            "bow",
-            "crossbow",
-            "shield"
+            "sword", "axe", "trident", "bow", "crossbow", "shield"
     };
 
     @Override
@@ -51,20 +45,19 @@ public class StrengthSMP extends JavaPlugin implements Listener {
         int strength = getConfig().getInt(uuid + ".strength", 0);
 
         player.sendMessage(ChatColor.GREEN + "====================");
-        player.sendMessage(ChatColor.GOLD + "Strength: " + ChatColor.YELLOW + strength + "+");
-        player.sendMessage(ChatColor.GOLD + "Class: " + ChatColor.YELLOW + clazz.toUpperCase());
-        player.sendMessage(ChatColor.GOLD + "Weapon: " + ChatColor.YELLOW + clazz.toUpperCase());
+        player.sendMessage(ChatColor.GOLD + "Strength: " + strength + "+");
+        player.sendMessage(ChatColor.GOLD + "Class: " + clazz.toUpperCase());
+        player.sendMessage(ChatColor.GOLD + "Weapon: " + clazz.toUpperCase());
         player.sendMessage(ChatColor.GREEN + "====================");
     }
 
-    // ===== REROLL USE =====
+    // ===== REROLL BOOK USE =====
     @EventHandler
     public void onUse(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
 
         if (item == null || item.getType() != Material.KNOWLEDGE_BOOK) return;
-
         if (!item.hasItemMeta()) return;
 
         ItemMeta meta = item.getItemMeta();
@@ -88,8 +81,8 @@ public class StrengthSMP extends JavaPlugin implements Listener {
     // ===== REROLL RECIPE =====
     private void setupRerollRecipe() {
 
-        ItemStack reroll = new ItemStack(Material.KNOWLEDGE_BOOK);
-        ItemMeta meta = reroll.getItemMeta();
+        ItemStack item = new ItemStack(Material.KNOWLEDGE_BOOK);
+        ItemMeta meta = item.getItemMeta();
 
         meta.setDisplayName(ChatColor.GREEN + "Reroll Guide");
         meta.setLore(Arrays.asList(
@@ -97,11 +90,11 @@ public class StrengthSMP extends JavaPlugin implements Listener {
                 ChatColor.DARK_GRAY + "Consumes on use"
         ));
 
-        reroll.setItemMeta(meta);
+        item.setItemMeta(meta);
 
         NamespacedKey key = new NamespacedKey(this, "reroll_book");
 
-        ShapedRecipe recipe = new ShapedRecipe(key, reroll);
+        ShapedRecipe recipe = new ShapedRecipe(key, item);
 
         recipe.shape(
                 "IGI",
@@ -113,6 +106,6 @@ public class StrengthSMP extends JavaPlugin implements Listener {
         recipe.setIngredient('G', Material.GOLD_BLOCK);
         recipe.setIngredient('D', Material.DIAMOND_BLOCK);
 
-        Bukkit.addRecipe(recipe);
+        getServer().addRecipe(recipe);
     }
 }
