@@ -86,7 +86,7 @@ public class StrengthSMP extends JavaPlugin implements Listener {
 
         double baseDamage = 1 + strength;
 
-        player.getAttribute(Attribute.ATTACK_DAMAGE)
+        player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)
                 .setBaseValue(baseDamage);
     }
 
