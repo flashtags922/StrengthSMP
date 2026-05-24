@@ -22,34 +22,19 @@ public class StrengthSMP extends JavaPlugin implements Listener {
     };
 
     @Override
-    public void onEnable() {
-        getServer().getPluginManager().registerEvents(this, this);
-        setupRerollRecipe();
-        saveDefaultConfig();
-    }
+public void onEnable() {
+    getServer().getPluginManager().registerEvents(this, this);
+    saveDefaultConfig();
+    setupRerollRecipe();
+    getLogger().info("StrengthSMP ENABLED");
+}
+    
 
     // ===== JOIN MESSAGE (CHAT ONLY) =====
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        String uuid = player.getUniqueId().toString();
-
-        if (!getConfig().isSet(uuid + ".class")) {
-            getConfig().set(uuid + ".class", "none");
-            getConfig().set(uuid + ".strength", 0);
-            saveConfig();
-        }
-
-        String clazz = getConfig().getString(uuid + ".class", "none");
-        int strength = getConfig().getInt(uuid + ".strength", 0);
-
-        player.sendMessage(ChatColor.GREEN + "====================");
-        player.sendMessage(ChatColor.GOLD + "Strength: " + strength + "+");
-        player.sendMessage(ChatColor.GOLD + "Class: " + clazz.toUpperCase());
-        player.sendMessage(ChatColor.GOLD + "Weapon: " + clazz.toUpperCase());
-        player.sendMessage(ChatColor.GREEN + "====================");
-    }
-
+  @EventHandler
+public void onJoin(PlayerJoinEvent event) {
+    event.getPlayer().sendMessage("TEST JOIN EVENT WORKS");
+}
     // ===== REROLL BOOK USE =====
     @EventHandler
     public void onUse(PlayerInteractEvent event) {
