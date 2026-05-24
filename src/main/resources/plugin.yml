@@ -3,6 +3,9 @@ version: 1.0
 main: me.anti.strength.StrengthSMP
 api-version: '1.21'
 
+author: Flashtags
+description: Strength SMP Plugin
+
 commands:
   strength:
     description: Check strength
