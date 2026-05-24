@@ -5,7 +5,7 @@ min_strength: -3
 strength_to_activate_ability: 5
 strength_to_have_passive: 5
 
-show_duration_in_actionbar: true
+show_duration_in_actionbar: false
 
 stun_axe_duration: 1
 sword_ultimate_multiplier: 1.5
