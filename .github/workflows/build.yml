@@ -1,4 +1,4 @@
-name: Build StrengthSMP
+name: Build
 
 on: [push]
 
@@ -7,17 +7,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Java 21
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      - name: Verify files (DEBUG STEP)
-        run: ls -R
+      - name: Build
+        run: mvn clean package
 
-      - name: Build with Maven
-        run: mvn -f pom.xml clean package -U
+      - name: Upload Jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: StrengthSMP
+          path: target/*.jar
