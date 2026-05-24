@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,29 +16,91 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
 import java.util.Random;
+
 public class StrengthSMP extends JavaPlugin implements Listener {
+
+    private final Random random = new Random();
 
     private final String[] CLASSES = {
             "sword", "axe", "trident", "bow", "crossbow", "shield"
     };
 
-    @Override
-public void onEnable() {
-    getServer().getPluginManager().registerEvents(this, this);
-    saveDefaultConfig();
-    setupRerollRecipe();
-    getLogger().info("StrengthSMP ENABLED");
-}
-    
+    private final String[] WEAPONS = {
+            "sword", "axe", "trident", "bow", "crossbow", "shield"
+    };
 
-    // ===== JOIN MESSAGE (CHAT ONLY) =====
-  @EventHandler
-public void onJoin(PlayerJoinEvent event) {
-    event.getPlayer().sendMessage("TEST JOIN EVENT WORKS");
-}
-    // ===== REROLL BOOK USE =====
+    @Override
+    public void onEnable() {
+        saveDefaultConfig();
+        getServer().getPluginManager().registerEvents(this, this);
+        setupRerollRecipe();
+
+        getLogger().info("StrengthSMP ENABLED");
+    }
+
+    // =========================
+    // PLAYER JOIN SYSTEM
+    // =========================
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+
+        Player player = event.getPlayer();
+        String uuid = player.getUniqueId().toString();
+
+        if (!getConfig().isSet(uuid + ".class")) {
+            getConfig().set(uuid + ".class", "none");
+            getConfig().set(uuid + ".weapon", "none");
+            getConfig().set(uuid + ".strength", getConfig().getInt("def_strength"));
+            saveConfig();
+        }
+
+        String clazz = getConfig().getString(uuid + ".class", "none");
+        String weapon = getConfig().getString(uuid + ".weapon", "none");
+        int strength = getConfig().getInt(uuid + ".strength");
+
+        // assign weapon once
+        if (weapon.equals("none")) {
+            weapon = WEAPONS[random.nextInt(WEAPONS.length)];
+            getConfig().set(uuid + ".weapon", weapon);
+            saveConfig();
+        }
+
+        player.sendMessage("§a====================");
+        player.sendMessage("§6Strength: §e" + strength);
+        player.sendMessage("§6Class: §e" + clazz.toUpperCase());
+        player.sendMessage("§6Weapon: §e" + weapon.toUpperCase());
+        player.sendMessage("§a====================");
+    }
+
+    // =========================
+    // DEATH = -STRENGTH SYSTEM
+    // =========================
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event) {
+
+        Player player = event.getEntity();
+        String uuid = player.getUniqueId().toString();
+
+        int min = getConfig().getInt("min_strength");
+
+        int current = getConfig().getInt(uuid + ".strength", 0);
+        boolean naturalLoss = getConfig().getBoolean("natural_cause_lose_strength");
+
+        if (naturalLoss) {
+            current -= 1;
+            if (current < min) current = min;
+
+            getConfig().set(uuid + ".strength", current);
+            saveConfig();
+        }
+    }
+
+    // =========================
+    // REROLL SYSTEM
+    // =========================
     @EventHandler
     public void onUse(PlayerInteractEvent event) {
+
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
 
@@ -51,18 +114,26 @@ public void onJoin(PlayerJoinEvent event) {
 
         event.setCancelled(true);
 
-        Random random = new Random();
-        String rolled = CLASSES[random.nextInt(CLASSES.length)];
+        String uuid = player.getUniqueId().toString();
 
-        getConfig().set(player.getUniqueId().toString() + ".class", rolled);
+        String rolledClass = CLASSES[random.nextInt(CLASSES.length)];
+        String rolledWeapon = WEAPONS[random.nextInt(WEAPONS.length)];
+
+        getConfig().set(uuid + ".class", rolledClass);
+        getConfig().set(uuid + ".weapon", rolledWeapon);
         saveConfig();
 
         item.setAmount(item.getAmount() - 1);
 
-        player.sendMessage(ChatColor.GOLD + "You rolled: " + ChatColor.YELLOW + rolled.toUpperCase());
+        player.sendMessage("§6====================");
+        player.sendMessage("§eNEW CLASS: §f" + rolledClass.toUpperCase());
+        player.sendMessage("§eNEW WEAPON: §f" + rolledWeapon.toUpperCase());
+        player.sendMessage("§6====================");
     }
 
-    // ===== REROLL RECIPE =====
+    // =========================
+    // REROLL RECIPE
+    // =========================
     private void setupRerollRecipe() {
 
         ItemStack item = new ItemStack(Material.KNOWLEDGE_BOOK);
@@ -70,7 +141,7 @@ public void onJoin(PlayerJoinEvent event) {
 
         meta.setDisplayName(ChatColor.GREEN + "Reroll Guide");
         meta.setLore(Arrays.asList(
-                ChatColor.GRAY + "Right-click to reroll your class",
+                ChatColor.GRAY + "Right click to reroll class",
                 ChatColor.DARK_GRAY + "Consumes on use"
         ));
 
