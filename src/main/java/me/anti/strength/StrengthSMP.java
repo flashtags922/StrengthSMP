@@ -41,36 +41,26 @@ public class StrengthSMP extends JavaPlugin implements Listener {
     // =========================
     // PLAYER JOIN SYSTEM
     // =========================
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
+   @EventHandler
+public void onJoin(PlayerJoinEvent event) {
 
-        Player player = event.getPlayer();
-        String uuid = player.getUniqueId().toString();
+    Player player = event.getPlayer();
+    String uuid = player.getUniqueId().toString();
 
-        if (!getConfig().isSet(uuid + ".class")) {
-            getConfig().set(uuid + ".class", "none");
-            getConfig().set(uuid + ".weapon", "none");
-            getConfig().set(uuid + ".strength", getConfig().getInt("def_strength"));
-            saveConfig();
-        }
-
-        String clazz = getConfig().getString(uuid + ".class", "none");
-        String weapon = getConfig().getString(uuid + ".weapon", "none");
-        int strength = getConfig().getInt(uuid + ".strength");
-
-        // assign weapon once
-        if (weapon.equals("none")) {
-            weapon = WEAPONS[random.nextInt(WEAPONS.length)];
-            getConfig().set(uuid + ".weapon", weapon);
-            saveConfig();
-        }
-
-        player.sendMessage("§a====================");
-        player.sendMessage("§6Strength: §e" + strength);
-        player.sendMessage("§6Class: §e" + clazz.toUpperCase());
-        player.sendMessage("§6Weapon: §e" + weapon.toUpperCase());
-        player.sendMessage("§a====================");
+    if (!getConfig().isSet(uuid + ".class")) {
+        getConfig().set(uuid + ".class", "none");
+        getConfig().set(uuid + ".strength", getConfig().getInt("def_strength"));
+        saveConfig();
     }
+
+    String weapon = getConfig().getString(uuid + ".class", "none");
+    int strength = getConfig().getInt(uuid + ".strength");
+
+    player.sendMessage("§a====================");
+    player.sendMessage("§6Strength: §e" + strength + "+");
+    player.sendMessage("§6Weapon: §e" + weapon.toUpperCase());
+    player.sendMessage("§a====================");
+}
 
     // =========================
     // DEATH = -STRENGTH SYSTEM
