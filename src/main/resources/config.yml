@@ -72,14 +72,14 @@ counters_passives:
 recipes:
   strength:
     shape:
-      - "ENE"
-      - "NSN"
-      - "ENE"
+  - "ENE"
+  - "NSN"
+  - "ENE"
 
-    ingredients:
-      E: ENCHANTED_GOLDEN_APPLE
-      N: NETHERITE_INGOT
-      S: NETHER_STAR
+ingredients:
+  E: ENCHANTED_GOLDEN_APPLE
+  N: NETHERITE_INGOT
+  S: NETHER_STAR
 
   reroll:
     shape:
