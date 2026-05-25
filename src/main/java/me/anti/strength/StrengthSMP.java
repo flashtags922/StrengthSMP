@@ -1,6 +1,7 @@
 package me.strengthsmp;
 
 import org.bukkit.*;
+import me.anti.strength.StrengthListener;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
