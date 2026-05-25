@@ -4,6 +4,7 @@ import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
+import java.util.Objects;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -32,8 +33,10 @@ public class StrengthSMPPlugin extends JavaPlugin implements Listener, CommandEx
 
         saveDefaultConfig();
 
-        Bukkit.getPluginManager().registerEvents(this, this);
-
+        Bukkit.getPluginManager().registerEvents(
+        new StrengthListener(this),
+        this
+);
         Objects.requireNonNull(getCommand("strength")).setExecutor(this);
         Objects.requireNonNull(getCommand("strengthsmp:withdraw")).setExecutor(this);
 
