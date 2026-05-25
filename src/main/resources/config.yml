@@ -3,7 +3,7 @@ def_strength: 3
 min_strength: -3
 
 strength_to_activate_ability: 5
-strength_to_have_passive: 5
+strength_to_have_passive: 3
 
 show_duration_in_actionbar: false
 
