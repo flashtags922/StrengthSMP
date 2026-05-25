@@ -1,4 +1,4 @@
-package me.strengthsmp;
+package me.anti.strength;
 
 import org.bukkit.*;
 import me.anti.strength.StrengthListener;
