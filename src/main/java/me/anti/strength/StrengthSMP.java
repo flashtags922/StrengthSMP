@@ -1,68 +1,112 @@
 package me.strengthsmp;
 
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.command.*;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.*;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.*;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 
-public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor {
+public class StrengthSMPPlugin extends JavaPlugin implements Listener, CommandExecutor {
 
     private final Map<UUID, Integer> strength = new HashMap<>();
-    private final Map<UUID, Weapon> weapon = new HashMap<>();
+    private final Map<UUID, String> weapon = new HashMap<>();
+    private final Map<UUID, Integer> combo = new HashMap<>();
+    private final Map<UUID, Boolean> axeUlt = new HashMap<>();
 
-    private final Map<UUID, Integer> swordCombo = new HashMap<>();
-    private final Map<UUID, Integer> axeCrit = new HashMap<>();
-    private final Map<UUID, Boolean> axeUltReady = new HashMap<>();
+    private final Random random = new Random();
 
-    private final Map<UUID, Long> axeUltCooldown = new HashMap<>();
+    private final String[] weapons = {
+            "SWORD", "AXE", "BOW", "TRIDENT", "CROSSBOW", "SHIELD"
+    };
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        Bukkit.getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(this, this);
 
         getCommand("strength").setExecutor(this);
         getCommand("strengthsmp:withdraw").setExecutor(this);
+        getCommand("rerollbook").setExecutor(this);
 
-        registerRecipes();
+        addRecipes(); // IMPORTANT
     }
 
     // ================= JOIN =================
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
+        UUID id = p.getUniqueId();
 
-        strength.putIfAbsent(p.getUniqueId(), getConfig().getInt("def_strength"));
+        strength.putIfAbsent(id, 3);
 
-        if (!weapon.containsKey(p.getUniqueId())) {
-            Weapon w = Weapon.random();
-            weapon.put(p.getUniqueId(), w);
-
-            giveWeapon(p, w);
-
-            p.sendMessage(ChatColor.YELLOW + "Your new weapon type is");
-            p.sendMessage(w.symbol + " " + w.color + w.name());
+        if (!weapon.containsKey(id)) {
+            weapon.put(id, weapons[random.nextInt(weapons.length)]);
         }
 
-        showStrength(p);
+        sendStatus(p);
+        giveRerollBook(p);
     }
 
-    // ================= WEAPON GIVE =================
-    private void giveWeapon(Player p, Weapon w) {
-        ItemStack item = new ItemStack(w.mat);
-        ItemMeta meta = item.getItemMeta();
+    // ================= STATUS =================
+    private void sendStatus(Player p) {
+        UUID id = p.getUniqueId();
 
-        meta.setDisplayName(w.symbol + " " + w.color + w.name());
+        p.sendMessage(ChatColor.RED + "Strength: +" + strength.get(id));
+        p.sendMessage(ChatColor.YELLOW + "Weapon: " + formatWeapon(weapon.get(id)));
+    }
+
+    private String formatWeapon(String w) {
+        switch (w) {
+            case "SWORD": return ChatColor.RED + "⚔ Sword";
+            case "AXE": return ChatColor.DARK_RED + "🪓 Axe";
+            case "BOW": return ChatColor.GREEN + "🏹 Bow";
+            case "TRIDENT": return ChatColor.AQUA + "🔱 Trident";
+            case "CROSSBOW": return ChatColor.BLUE + "➹ Crossbow";
+            case "SHIELD": return ChatColor.GRAY + "🛡 Shield";
+        }
+        return w;
+    }
+
+    // ================= COMMANDS =================
+    @Override
+    public boolean onCommand(CommandSender s, Command c, String l, String[] args) {
+
+        if (!(s instanceof Player)) return true;
+        Player p = (Player) s;
+        UUID id = p.getUniqueId();
+
+        if (c.getName().equalsIgnoreCase("strength")) {
+            sendStatus(p);
+        }
+
+        if (c.getName().equalsIgnoreCase("strengthsmp:withdraw")) {
+            int amt = args.length > 0 ? Integer.parseInt(args[0]) : 1;
+            strength.put(id, Math.max(-3, strength.get(id) - amt));
+            p.sendMessage(ChatColor.RED + "Withdrawn " + amt + " strength.");
+        }
+
+        if (c.getName().equalsIgnoreCase("rerollbook")) {
+            String w = weapons[random.nextInt(weapons.length)];
+            weapon.put(id, w);
+
+            p.sendMessage(ChatColor.YELLOW + "Your new weapon type is");
+            p.sendMessage(formatWeapon(w));
+        }
+
+        return true;
+    }
+
+    private void giveRerollBook(Player p) {
+        ItemStack item = new ItemStack(Material.BOOK);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(ChatColor.GREEN + "Reroll Book");
         item.setItemMeta(meta);
 
         p.getInventory().addItem(item);
@@ -70,159 +114,128 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
     // ================= COMBAT =================
     @EventHandler
-    public void hit(EntityDamageByEntityEvent e) {
-        if (!(e.getDamager() instanceof Player p)) return;
+    public void onHit(EntityDamageByEntityEvent e) {
 
-        Weapon w = weapon.get(p.getUniqueId());
-        if (w == null) return;
+        if (!(e.getDamager() instanceof Player)) return;
+        if (!(e.getEntity() instanceof Player)) return;
+
+        Player p = (Player) e.getDamager();
+        Player t = (Player) e.getEntity();
 
         UUID id = p.getUniqueId();
+        String w = weapon.get(id);
 
-        // ================= SWORD =================
-        if (w == Weapon.SWORD) {
-            int c = swordCombo.getOrDefault(id, 0) + 1;
-            swordCombo.put(id, c);
+        if (w == null) return;
 
-            if (c >= 3) {
-                e.setDamage(e.getDamage() * 1.3);
+        int c = combo.getOrDefault(id, 0) + 1;
+        combo.put(id, c);
+
+        Bukkit.getScheduler().runTaskLater(this, () -> combo.put(id, 0), 60);
+
+        // ================= AXE =================
+        if (w.equals("AXE")) {
+
+            if (c % 5 == 0) {
+                stun(t, 20);
+                p.sendMessage(ChatColor.RED + "STUN!");
             }
 
-            if (c >= 5) {
-                p.sendMessage(ChatColor.RED + "⚔ Ready");
-                swordCombo.put(id, 0);
+            if (axeUlt.getOrDefault(id, false)) {
+                e.setDamage(8);
+                axeUlt.put(id, false);
+            }
+
+            if (c == 5) {
+                axeUlt.put(id, true);
             }
         }
 
-        // ================= AXE =================
-        if (w == Weapon.AXE) {
-
-            int c = axeCrit.getOrDefault(id, 0) + 1;
-            axeCrit.put(id, c);
-
-            if (c >= 5) {
-                axeCrit.put(id, 0);
-                stun((Player) e.getEntity());
+        // ================= SWORD =================
+        if (w.equals("SWORD")) {
+            if (c % 3 == 0) {
+                e.setDamage(e.getDamage() * 1.5);
             }
+        }
 
-            if (axeUltReady.getOrDefault(id, false)) {
-                e.setDamage(e.getDamage() * 3);
-                axeUltReady.put(id, false);
+        // ================= TRIDENT =================
+        if (w.equals("TRIDENT")) {
+            t.getWorld().strikeLightningEffect(t.getLocation());
+        }
+
+        // ================= BOW =================
+        if (w.equals("BOW")) {
+            if (c % 3 == 0) {
+                e.setDamage(e.getDamage() * 2);
+            }
+        }
+
+        // ================= CROSSBOW =================
+        if (w.equals("CROSSBOW")) {
+            if (c % 5 == 0) {
+                t.teleport(p.getLocation());
+            }
+        }
+
+        // ================= SHIELD =================
+        if (w.equals("SHIELD")) {
+            if (strength.get(id) >= 5) {
+                p.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                        org.bukkit.potion.PotionEffectType.DAMAGE_RESISTANCE, 40, 1));
             }
         }
     }
 
     // ================= STUN =================
-    private void stun(Player p) {
-        p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20, 255));
-        p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 1));
+    private void stun(Player p, int ticks) {
+        new BukkitRunnable() {
+            int i = 0;
 
-        p.setWalkSpeed(0f);
-        Bukkit.getScheduler().runTaskLater(this, () -> p.setWalkSpeed(0.2f), 20L);
+            @Override
+            public void run() {
+                if (i++ > ticks) {
+                    cancel();
+                    return;
+                }
 
-        p.getWorld().spawnParticle(Particle.SPELL_WITCH, p.getLocation(), 15);
-    }
-
-    // ================= REROLL BOOK =================
-    @EventHandler
-    public void click(PlayerInteractEvent e) {
-        Player p = e.getPlayer();
-        ItemStack item = e.getItem();
-
-        if (item == null || item.getType() != Material.KNOWLEDGE_BOOK) return;
-
-        Weapon w = Weapon.random();
-        weapon.put(p.getUniqueId(), w);
-
-        p.sendMessage(ChatColor.YELLOW + "Your new weapon type is");
-        p.sendMessage(w.symbol + " " + w.color + w.name());
-
-        giveWeapon(p, w);
-    }
-
-    // ================= COMMANDS =================
-    @Override
-    public boolean onCommand(CommandSender s, Command cmd, String l, String[] args) {
-
-        if (!(s instanceof Player p)) return true;
-
-        if (cmd.getName().equalsIgnoreCase("strength")) {
-            showStrength(p);
-            return true;
-        }
-
-        if (cmd.getName().equalsIgnoreCase("strengthsmp:withdraw")) {
-            int amt = Integer.parseInt(args[0]);
-
-            strength.put(p.getUniqueId(),
-                    Math.max(0, strength.get(p.getUniqueId()) - amt));
-
-            showStrength(p);
-            return true;
-        }
-
-        return false;
-    }
-
-    // ================= DISPLAY =================
-    private void showStrength(Player p) {
-        int s = strength.get(p.getUniqueId());
-        Weapon w = weapon.get(p.getUniqueId());
-
-        p.sendMessage(ChatColor.RED + "Strength: +" + s);
-        p.sendMessage(ChatColor.GRAY + "Weapon: " + w.symbol + " " + w.color + w.name());
+                p.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                        org.bukkit.potion.PotionEffectType.SLOW, 10, 10));
+            }
+        }.runTaskTimer(this, 0, 1);
     }
 
     // ================= RECIPES =================
-    private void registerRecipes() {
+    private void addRecipes() {
 
-        // STRENGTH RECIPE
-        ItemStack strengthBook = new ItemStack(Material.ENCHANTED_BOOK);
-        NamespacedKey k1 = new NamespacedKey(this, "strength");
+        // STRENGTH CORE
+        ItemStack core = new ItemStack(Material.NETHER_STAR);
+        ItemMeta cm = core.getItemMeta();
+        cm.setDisplayName(ChatColor.RED + "Strength Core");
+        core.setItemMeta(cm);
 
-        ShapedRecipe r1 = new ShapedRecipe(k1, strengthBook);
-        r1.shape("ENE","NSN","ENE");
+        NamespacedKey k1 = new NamespacedKey(this, "strength_core");
 
+        ShapedRecipe r1 = new ShapedRecipe(k1, core);
+        r1.shape("EIE", "INI", "EIE");
         r1.setIngredient('E', Material.ENCHANTED_GOLDEN_APPLE);
-        r1.setIngredient('N', Material.NETHERITE_INGOT);
-        r1.setIngredient('S', Material.NETHER_STAR);
+        r1.setIngredient('I', Material.NETHERITE_INGOT);
+        r1.setIngredient('N', Material.NETHER_STAR);
 
         Bukkit.addRecipe(r1);
 
         // REROLL BOOK
-        ItemStack reroll = new ItemStack(Material.KNOWLEDGE_BOOK);
-        NamespacedKey k2 = new NamespacedKey(this, "reroll");
+        ItemStack book = new ItemStack(Material.BOOK);
+        ItemMeta bm = book.getItemMeta();
+        bm.setDisplayName(ChatColor.GREEN + "Reroll Book");
+        book.setItemMeta(bm);
 
-        ShapedRecipe r2 = new ShapedRecipe(k2, reroll);
-        r2.shape("IGI","GDG","IGI");
+        NamespacedKey k2 = new NamespacedKey(this, "reroll_book");
 
+        ShapedRecipe r2 = new ShapedRecipe(k2, book);
+        r2.shape("IGI", "GDG", "IGI");
         r2.setIngredient('I', Material.IRON_BLOCK);
         r2.setIngredient('G', Material.GOLD_BLOCK);
         r2.setIngredient('D', Material.DIAMOND_BLOCK);
 
         Bukkit.addRecipe(r2);
-    }
-
-    // ================= WEAPONS =================
-    enum Weapon {
-        SWORD(ChatColor.RED, "⚔", Material.DIAMOND_SWORD),
-        AXE(ChatColor.DARK_RED, "🪓", Material.DIAMOND_AXE),
-        BOW(ChatColor.GOLD, "🏹", Material.BOW),
-        TRIDENT(ChatColor.AQUA, "🔱", Material.TRIDENT),
-        SHIELD(ChatColor.GRAY, "🛡", Material.SHIELD),
-        CROSSBOW(ChatColor.GREEN, "➹", Material.CROSSBOW);
-
-        ChatColor color;
-        String symbol;
-        Material mat;
-
-        Weapon(ChatColor c, String s, Material m) {
-            color = c;
-            symbol = s;
-            mat = m;
-        }
-
-        static Weapon random() {
-            return values()[new Random().nextInt(values().length)];
-        }
     }
 }
