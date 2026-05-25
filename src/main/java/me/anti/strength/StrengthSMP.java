@@ -36,27 +36,36 @@ public class StrengthSMP extends JavaPlugin implements Listener {
     // =========================
     // JOIN SYSTEM
     // =========================
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
+   @EventHandler
+public void onJoin(PlayerJoinEvent event) {
 
-        Player player = event.getPlayer();
-        String uuid = player.getUniqueId().toString();
+    Player player = event.getPlayer();
+    String uuid = player.getUniqueId().toString();
 
-        // create default data
-        if (!getConfig().isSet(uuid + ".class")) {
-            getConfig().set(uuid + ".class", "none");
-            getConfig().set(uuid + ".strength", getConfig().getInt("def_strength"));
-            saveConfig();
-        }
+    // create player data
+    if (!getConfig().isSet(uuid + ".class")) {
 
-        String weapon = getConfig().getString(uuid + ".class", "none");
-        int strength = getConfig().getInt(uuid + ".strength");
+        // random weapon/class on FIRST JOIN
+        String rolledClass = CLASSES[random.nextInt(CLASSES.length)];
 
-        player.sendMessage("§a====================");
-        player.sendMessage("§6Strength: §e" + strength + "+");
-        player.sendMessage("§6Weapon: §e" + weapon.toUpperCase());
-        player.sendMessage("§a====================");
+        getConfig().set(uuid + ".class", rolledClass);
+
+        // default strength from config
+        getConfig().set(uuid + ".strength",
+                getConfig().getInt("def_strength"));
+
+        saveConfig();
     }
+
+    String weapon = getConfig().getString(uuid + ".class", "none");
+    int strength = getConfig().getInt(uuid + ".strength");
+
+    // ===== RED THEME MESSAGE =====
+    player.sendMessage("§4§m----------------------------");
+    player.sendMessage("§c⚔ §4Strength: §f" + strength + "+");
+    player.sendMessage("§c⚔ §4Weapon: §f" + weapon.toUpperCase());
+    player.sendMessage("§4§m----------------------------");
+}
 
     // =========================
     // REROLL SYSTEM (CHANGES WEAPON = CLASS)
