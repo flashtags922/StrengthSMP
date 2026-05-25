@@ -1,6 +1,6 @@
 name: StrengthSMP
 version: 1.0
-main: me.smp.StrengthSMP
+main: me.anti.strength.StrengthSMP
 api-version: 1.21
 
 commands:
