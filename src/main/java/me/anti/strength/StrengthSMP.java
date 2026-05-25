@@ -15,8 +15,8 @@ import java.util.*;
 
 public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor {
 
-    private final Map<UUID, Integer> strength = new HashMap<>();
-    private final Map<UUID, String> weapon = new HashMap<>();
+    public final Map<UUID, Integer> strength = new HashMap<>();
+    public final Map<UUID, String> weapon = new HashMap<>();
 
     private final Random random = new Random();
 
