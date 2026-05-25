@@ -29,43 +29,55 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
             "SHIELD"
     };
 
-    @Override
-    public void onEnable() {
+   @Override
+public void onEnable() {
 
-        saveDefaultConfig();
+    saveDefaultConfig();
 
-        Bukkit.getPluginManager().registerEvents(
-        new StrengthListener(this),
-        this
-);
-        Objects.requireNonNull(getCommand("strength")).setExecutor(this);
-        Objects.requireNonNull(getCommand("strengthsmp:withdraw")).setExecutor(this);
+    // JOIN EVENTS
+    Bukkit.getPluginManager().registerEvents(this, this);
 
-        addRecipes();
+    // COMBAT LISTENER
+    Bukkit.getPluginManager().registerEvents(
+            new StrengthListener(this),
+            this
+    );
 
-        getLogger().info("StrengthSMP Enabled!");
-    }
+    Objects.requireNonNull(getCommand("strength")).setExecutor(this);
+    Objects.requireNonNull(getCommand("strengthsmp:withdraw")).setExecutor(this);
+
+    addRecipes();
+
+    getLogger().info("StrengthSMP Enabled!");
+}
 
     // ================= JOIN =================
-    @EventHandler
-    public void onJoin(PlayerJoinEvent e) {
+   @EventHandler
+public void onJoin(PlayerJoinEvent e) {
 
-        Player p = e.getPlayer();
-        UUID id = p.getUniqueId();
+    Player player = e.getPlayer();
 
-        if (!strength.containsKey(id)) {
-            strength.put(id, 3);
-        }
+    UUID id = player.getUniqueId();
 
-        if (!weapon.containsKey(id)) {
+    strength.putIfAbsent(id, 3);
 
-            String randomWeapon = weapons[random.nextInt(weapons.length)];
+    if (!weapon.containsKey(id)) {
 
-            weapon.put(id, randomWeapon);
-        }
+        String[] weapons = {
+                "SWORD",
+                "AXE",
+                "BOW",
+                "TRIDENT",
+                "CROSSBOW",
+                "SHIELD"
+        };
 
-        sendStatus(p);
+        weapon.put(id, weapons[new Random().nextInt(weapons.length)]);
     }
+
+    player.sendMessage(ChatColor.RED + "Strength: +" + strength.get(id));
+    player.sendMessage(ChatColor.YELLOW + "Weapon: " + formatWeapon(weapon.get(id)));
+}
 
     // ================= STATUS =================
     private void sendStatus(Player p) {
@@ -110,57 +122,59 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
     // ================= COMMANDS =================
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if (!(sender instanceof Player)) {
-            return true;
-        }
+    if (!(sender instanceof Player)) return true;
 
-        Player p = (Player) sender;
-        UUID id = p.getUniqueId();
+    Player player = (Player) sender;
 
-        // ================= /strength =================
-        if (command.getName().equalsIgnoreCase("strength")) {
+    UUID id = player.getUniqueId();
 
-            sendStatus(p);
+    // ================= /strength =================
+    if (command.getName().equalsIgnoreCase("strength")) {
 
-            return true;
-        }
+        int str = strength.getOrDefault(id, 3);
 
-        // ================= /strengthsmp:withdraw =================
-        if (command.getName().equalsIgnoreCase("strengthsmp:withdraw")) {
+        String w = weapon.getOrDefault(id, "NONE");
 
-            int amount = 1;
-
-            try {
-
-                if (args.length > 0) {
-                    amount = Integer.parseInt(args[0]);
-                }
-
-            } catch (Exception ex) {
-
-                p.sendMessage(ChatColor.RED + "Invalid number.");
-                return true;
-            }
-
-            int current = strength.getOrDefault(id, 0);
-
-            current -= amount;
-
-            if (current < -3) {
-                current = -3;
-            }
-
-            strength.put(id, current);
-
-            p.sendMessage(ChatColor.RED + "Withdrawn " + amount + " strength.");
-
-            return true;
-        }
+        player.sendMessage(ChatColor.RED + "Strength: +" + str);
+        player.sendMessage(ChatColor.YELLOW + "Weapon: " + formatWeapon(w));
 
         return true;
     }
+
+    // ================= /strengthsmp:withdraw =================
+    if (command.getName().equalsIgnoreCase("strengthsmp:withdraw")) {
+
+        if (args.length == 0) {
+            player.sendMessage(ChatColor.RED + "/strengthsmp:withdraw <amount>");
+            return true;
+        }
+
+        int amount;
+
+        try {
+            amount = Integer.parseInt(args[0]);
+        } catch (Exception e) {
+            player.sendMessage(ChatColor.RED + "Invalid number.");
+            return true;
+        }
+
+        int current = strength.getOrDefault(id, 3);
+
+        current -= amount;
+
+        if (current < -3) current = -3;
+
+        strength.put(id, current);
+
+        player.sendMessage(ChatColor.RED + "Withdrawn " + amount + " strength.");
+
+        return true;
+    }
+
+    return true;
+}
 
     // ================= RECIPES =================
     private void addRecipes() {
