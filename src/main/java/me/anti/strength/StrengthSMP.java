@@ -13,7 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
-public class StrengthSMPPlugin extends JavaPlugin implements Listener, CommandExecutor {
+public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor {
 
     private final Map<UUID, Integer> strength = new HashMap<>();
     private final Map<UUID, String> weapon = new HashMap<>();
