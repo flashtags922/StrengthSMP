@@ -5,6 +5,7 @@ import me.anti.strength.StrengthListener;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
+import org.bukkit.event.Listener;
 import java.util.Objects;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.*;
@@ -52,7 +53,7 @@ public void onEnable() {
 }
 
     // ================= JOIN =================
-   @EventHandler
+  @EventHandler
 public void onJoin(PlayerJoinEvent e) {
 
     Player player = e.getPlayer();
@@ -78,7 +79,6 @@ public void onJoin(PlayerJoinEvent e) {
     player.sendMessage(ChatColor.RED + "Strength: +" + strength.get(id));
     player.sendMessage(ChatColor.YELLOW + "Weapon: " + formatWeapon(weapon.get(id)));
 }
-
     // ================= STATUS =================
     private void sendStatus(Player p) {
 
