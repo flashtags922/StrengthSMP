@@ -1,7 +1,12 @@
 package me.anti.strength;
 
-import org.bukkit.*;
-import org.bukkit.command.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,6 +51,12 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
                 this
         );
 
+        // REROLL LISTENER
+        Bukkit.getPluginManager().registerEvents(
+                new RerollListener(this),
+                this
+        );
+
         // COMMANDS
         getCommand("strength").setExecutor(this);
         getCommand("withdraw").setExecutor(this);
@@ -60,8 +71,6 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
 
-        Bukkit.getLogger().info("JOIN EVENT WORKED");
-
         Player player = e.getPlayer();
 
         UUID id = player.getUniqueId();
@@ -72,8 +81,18 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
             weapon.put(id, weapons[random.nextInt(weapons.length)]);
         }
 
-        player.sendMessage(ChatColor.RED + "Strength: +" + strength.get(id));
-        player.sendMessage(ChatColor.YELLOW + "Weapon: " + formatWeapon(weapon.get(id)));
+        player.sendMessage(
+                ChatColor.YELLOW +
+                "Strength: " +
+                ChatColor.RED +
+                "+" + strength.get(id)
+        );
+
+        player.sendMessage(
+                ChatColor.YELLOW +
+                "Weapon: " +
+                MessageManager.formatWeapon(weapon.get(id))
+        );
     }
 
     // ================= STATUS =================
@@ -82,42 +101,32 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
         UUID id = p.getUniqueId();
 
         int playerStrength = strength.getOrDefault(id, 3);
-        String playerWeapon = weapon.getOrDefault(id, "NONE");
 
-        p.sendMessage(ChatColor.RED + "Strength: +" + playerStrength);
-        p.sendMessage(ChatColor.YELLOW + "Weapon: " + MessageManager.formatWeapon(playerWeapon));
-    }
+        String playerWeapon =
+                weapon.getOrDefault(id, "NONE");
 
-    // ================= WEAPON FORMAT =================
-    private String formatWeapon(String weapon) {
+        p.sendMessage(
+                ChatColor.YELLOW +
+                "Strength: " +
+                ChatColor.RED +
+                "+" + playerStrength
+        );
 
-        switch (weapon.toUpperCase()) {
-
-            case "SWORD":
-                return ChatColor.RED + "⚔ Sword";
-
-            case "AXE":
-                return ChatColor.DARK_RED + "🪓 Axe";
-
-            case "BOW":
-                return ChatColor.GREEN + "🏹 Bow";
-
-            case "TRIDENT":
-                return ChatColor.AQUA + "🔱 Trident";
-
-            case "CROSSBOW":
-                return ChatColor.BLUE + "➹ Crossbow";
-
-            case "SHIELD":
-                return ChatColor.GRAY + "🛡 Shield";
-        }
-
-        return ChatColor.WHITE + weapon;
+        p.sendMessage(
+                ChatColor.YELLOW +
+                "Weapon: " +
+                MessageManager.formatWeapon(playerWeapon)
+        );
     }
 
     // ================= COMMANDS =================
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(
+            CommandSender sender,
+            Command command,
+            String label,
+            String[] args
+    ) {
 
         if (!(sender instanceof Player)) {
             return true;
@@ -139,20 +148,33 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
         if (command.getName().equalsIgnoreCase("withdraw")) {
 
             if (args.length == 0) {
-                player.sendMessage(ChatColor.RED + "/withdraw <amount>");
+
+                player.sendMessage(
+                        ChatColor.RED +
+                        "/withdraw <amount>"
+                );
+
                 return true;
             }
 
             int amount;
 
             try {
+
                 amount = Integer.parseInt(args[0]);
+
             } catch (Exception e) {
-                player.sendMessage(ChatColor.RED + "Invalid number.");
+
+                player.sendMessage(
+                        ChatColor.RED +
+                        "Invalid number."
+                );
+
                 return true;
             }
 
-            int current = strength.getOrDefault(id, 3);
+            int current =
+                    strength.getOrDefault(id, 3);
 
             current -= amount;
 
@@ -162,7 +184,12 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
             strength.put(id, current);
 
-            player.sendMessage(ChatColor.RED + "Withdrawn " + amount + " strength.");
+            player.sendMessage(
+                    ChatColor.RED +
+                    "Withdrawn " +
+                    amount +
+                    " strength."
+            );
 
             return true;
         }
@@ -174,20 +201,27 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
     private void addRecipes() {
 
         // ================= STRENGTH CORE =================
-        ItemStack strengthCore = new ItemStack(Material.NETHER_STAR);
+        ItemStack strengthCore =
+                new ItemStack(Material.NETHER_STAR);
 
-        ItemMeta coreMeta = strengthCore.getItemMeta();
+        ItemMeta coreMeta =
+                strengthCore.getItemMeta();
 
         if (coreMeta != null) {
 
-            coreMeta.setDisplayName(ChatColor.RED + "Strength Core");
+            coreMeta.setDisplayName(
+                    ChatColor.RED +
+                    "Strength Core"
+            );
 
             strengthCore.setItemMeta(coreMeta);
         }
 
-        NamespacedKey coreKey = new NamespacedKey(this, "strength_core");
+        NamespacedKey coreKey =
+                new NamespacedKey(this, "strength_core");
 
-        ShapedRecipe coreRecipe = new ShapedRecipe(coreKey, strengthCore);
+        ShapedRecipe coreRecipe =
+                new ShapedRecipe(coreKey, strengthCore);
 
         coreRecipe.shape(
                 "EIE",
@@ -195,27 +229,45 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
                 "EIE"
         );
 
-        coreRecipe.setIngredient('E', Material.ENCHANTED_GOLDEN_APPLE);
-        coreRecipe.setIngredient('I', Material.NETHERITE_INGOT);
-        coreRecipe.setIngredient('N', Material.NETHER_STAR);
+        coreRecipe.setIngredient(
+                'E',
+                Material.ENCHANTED_GOLDEN_APPLE
+        );
+
+        coreRecipe.setIngredient(
+                'I',
+                Material.NETHERITE_INGOT
+        );
+
+        coreRecipe.setIngredient(
+                'N',
+                Material.NETHER_STAR
+        );
 
         Bukkit.addRecipe(coreRecipe);
 
         // ================= REROLL BOOK =================
-        ItemStack rerollBook = new ItemStack(Material.BOOK);
+        ItemStack rerollBook =
+                new ItemStack(Material.BOOK);
 
-        ItemMeta bookMeta = rerollBook.getItemMeta();
+        ItemMeta bookMeta =
+                rerollBook.getItemMeta();
 
         if (bookMeta != null) {
 
-            bookMeta.setDisplayName(ChatColor.GREEN + "Reroll Book");
+            bookMeta.setDisplayName(
+                    ChatColor.GREEN +
+                    "Reroll Book"
+            );
 
             rerollBook.setItemMeta(bookMeta);
         }
 
-        NamespacedKey rerollKey = new NamespacedKey(this, "reroll_book");
+        NamespacedKey rerollKey =
+                new NamespacedKey(this, "reroll_book");
 
-        ShapedRecipe rerollRecipe = new ShapedRecipe(rerollKey, rerollBook);
+        ShapedRecipe rerollRecipe =
+                new ShapedRecipe(rerollKey, rerollBook);
 
         rerollRecipe.shape(
                 "IGI",
@@ -223,9 +275,20 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
                 "IGI"
         );
 
-        rerollRecipe.setIngredient('I', Material.IRON_BLOCK);
-        rerollRecipe.setIngredient('G', Material.GOLD_BLOCK);
-        rerollRecipe.setIngredient('D', Material.DIAMOND_BLOCK);
+        rerollRecipe.setIngredient(
+                'I',
+                Material.IRON_BLOCK
+        );
+
+        rerollRecipe.setIngredient(
+                'G',
+                Material.GOLD_BLOCK
+        );
+
+        rerollRecipe.setIngredient(
+                'D',
+                Material.DIAMOND_BLOCK
+        );
 
         Bukkit.addRecipe(rerollRecipe);
     }
