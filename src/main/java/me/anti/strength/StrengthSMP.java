@@ -123,10 +123,12 @@ public void onJoin(PlayerJoinEvent e) {
     }
 
     // ================= COMMANDS =================
-    @Override
+   @Override
 public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-    if (!(sender instanceof Player)) return true;
+    if (!(sender instanceof Player)) {
+        return true;
+    }
 
     Player player = (Player) sender;
 
@@ -145,6 +147,40 @@ public boolean onCommand(CommandSender sender, Command command, String label, St
         return true;
     }
 
+    // ================= /withdraw =================
+    if (command.getName().equalsIgnoreCase("withdraw")) {
+
+        if (args.length == 0) {
+            player.sendMessage(ChatColor.RED + "/withdraw <amount>");
+            return true;
+        }
+
+        int amount;
+
+        try {
+            amount = Integer.parseInt(args[0]);
+        } catch (Exception e) {
+            player.sendMessage(ChatColor.RED + "Invalid number.");
+            return true;
+        }
+
+        int current = strength.getOrDefault(id, 3);
+
+        current -= amount;
+
+        if (current < -3) {
+            current = -3;
+        }
+
+        strength.put(id, current);
+
+        player.sendMessage(ChatColor.RED + "Withdrawn " + amount + " strength.");
+
+        return true;
+    }
+
+    return true;
+}
     // ================= /withdraw =================
 if (command.getName().equalsIgnoreCase("withdraw")) {
 
