@@ -1,14 +1,16 @@
 max_strength: 5
-def_strength: 3
+def_strength: 0
 min_strength: -3
 
 strength_to_activate_ability: 5
-strength_to_have_passive: 3
+strength_to_have_passive: 5
 
-show_duration_in_actionbar: false
+show_duration_in_actionbar: true
 
 stun_axe_duration: 1
+
 sword_ultimate_multiplier: 1.5
+
 mace_cooldown: 30
 
 bow_beam_damage: 4
@@ -70,25 +72,26 @@ counters_passives:
   bow: 5
 
 recipes:
-
   strength:
     shape:
-      - "ENE"
-      - "NSN"
-      - "ENE"
+      - "EIE"
+      - "INI"
+      - "EIE"
 
     ingredients:
       E: ENCHANTED_GOLDEN_APPLE
-      N: NETHERITE_INGOT
-      S: NETHER_STAR
+      I: NETHERITE_INGOT
+      N: NETHER_STAR
 
   reroll:
     shape:
-      - "IGI"
-      - "GDG"
-      - "IGI"
+      - "DND"
+      - "EWE"
+      - "DTD"
 
     ingredients:
-      I: IRON_BLOCK
-      G: GOLD_BLOCK
       D: DIAMOND_BLOCK
+      N: NETHERITE_HOE
+      W: WITHER_SKELETON_SKULL
+      E: ECHO_SHARD
+      T: TRIDENT
