@@ -1,11 +1,11 @@
 name: StrengthSMP
 version: 1.0
 main: me.anti.strength.StrengthSMP
-api-version: 1.21
+api-version: '1.21'
 
 commands:
   strength:
-    description: strength
+    description: Show your strength
 
   strengthsmp:withdraw:
-    description: withdraw
+    description: Withdraw strength
