@@ -83,15 +83,15 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
         player.sendMessage(
                 ChatColor.YELLOW +
-                "Strength: " +
-                ChatColor.RED +
-                "+" + strength.get(id)
+                        "Strength: " +
+                        ChatColor.RED +
+                        "+" + strength.get(id)
         );
 
         player.sendMessage(
                 ChatColor.YELLOW +
-                "Weapon: " +
-                MessageManager.formatWeapon(weapon.get(id))
+                        "Weapon: " +
+                        MessageManager.formatWeapon(weapon.get(id))
         );
     }
 
@@ -100,22 +100,23 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
         UUID id = p.getUniqueId();
 
-        int playerStrength = strength.getOrDefault(id, 3);
+        int playerStrength =
+                strength.getOrDefault(id, 3);
 
         String playerWeapon =
                 weapon.getOrDefault(id, "NONE");
 
         p.sendMessage(
                 ChatColor.YELLOW +
-                "Strength: " +
-                ChatColor.RED +
-                "+" + playerStrength
+                        "Strength: " +
+                        ChatColor.RED +
+                        "+" + playerStrength
         );
 
         p.sendMessage(
                 ChatColor.YELLOW +
-                "Weapon: " +
-                MessageManager.formatWeapon(playerWeapon)
+                        "Weapon: " +
+                        MessageManager.formatWeapon(playerWeapon)
         );
     }
 
@@ -151,7 +152,7 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
                 player.sendMessage(
                         ChatColor.RED +
-                        "/withdraw <amount>"
+                                "/withdraw <amount>"
                 );
 
                 return true;
@@ -167,7 +168,7 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
                 player.sendMessage(
                         ChatColor.RED +
-                        "Invalid number."
+                                "Invalid number."
                 );
 
                 return true;
@@ -184,11 +185,18 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
             strength.put(id, current);
 
+            WithdrawManager.giveStrengthOrb(
+                    player,
+                    amount
+            );
+
             player.sendMessage(
-                    ChatColor.RED +
-                    "Withdrawn " +
-                    amount +
-                    " strength."
+                    ChatColor.YELLOW +
+                            "You withdrew "
+                            + ChatColor.RED +
+                            amount +
+                            ChatColor.YELLOW +
+                            " strength."
             );
 
             return true;
@@ -211,7 +219,7 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
             coreMeta.setDisplayName(
                     ChatColor.RED +
-                    "Strength Core"
+                            "Strength Core"
             );
 
             strengthCore.setItemMeta(coreMeta);
@@ -257,7 +265,7 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
             bookMeta.setDisplayName(
                     ChatColor.GREEN +
-                    "Reroll Book"
+                            "Reroll Book"
             );
 
             rerollBook.setItemMeta(bookMeta);
