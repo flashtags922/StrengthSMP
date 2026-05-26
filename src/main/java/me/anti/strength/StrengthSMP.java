@@ -45,8 +45,8 @@ public void onEnable() {
             this
     );
 
-    Objects.requireNonNull(getCommand("strength")).setExecutor(this);
-    Objects.requireNonNull(getCommand("strengthsmp:withdraw")).setExecutor(this);
+    getCommand("strength").setExecutor(this);
+    getCommand("strengthsmp:withdraw").setExecutor(this);
 
     addRecipes();
 
