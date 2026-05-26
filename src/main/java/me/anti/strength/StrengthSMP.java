@@ -85,7 +85,7 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
         String playerWeapon = weapon.getOrDefault(id, "NONE");
 
         p.sendMessage(ChatColor.RED + "Strength: +" + playerStrength);
-        p.sendMessage(ChatColor.YELLOW + "Weapon: " + formatWeapon(playerWeapon));
+        p.sendMessage(ChatColor.YELLOW + "Weapon: " + MessageManager.formatWeapon(playerWeapon));
     }
 
     // ================= WEAPON FORMAT =================
