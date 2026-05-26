@@ -46,8 +46,7 @@ public void onEnable() {
     );
 
     getCommand("strength").setExecutor(this);
-    getCommand("strengthsmp:withdraw").setExecutor(this);
-
+    getCommand("withdraw").setExecutor(this);
     addRecipes();
 
     getLogger().info("StrengthSMP Enabled!");
@@ -147,7 +146,7 @@ public boolean onCommand(CommandSender sender, Command command, String label, St
     }
 
     // ================= /strengthsmp:withdraw =================
-    if (command.getName().equalsIgnoreCase("strengthsmp:withdraw")) {
+   if (command.getName().equalsIgnoreCase("withdraw"))
 
         if (args.length == 0) {
             player.sendMessage(ChatColor.RED + "/strengthsmp:withdraw <amount>");
