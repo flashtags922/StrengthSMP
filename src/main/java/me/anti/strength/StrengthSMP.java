@@ -5,6 +5,7 @@ import me.anti.strength.StrengthListener;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import java.util.Objects;
 import org.bukkit.event.player.PlayerJoinEvent;
