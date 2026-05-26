@@ -5,7 +5,7 @@ api-version: 1.21
 
 commands:
   strength:
-    description: Shows your strength
+    description: strength
 
   strengthsmp:withdraw:
-    description: Withdraw strength
+    description: withdraw
