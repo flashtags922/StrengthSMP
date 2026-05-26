@@ -56,6 +56,8 @@ public void onEnable() {
   @EventHandler
 public void onJoin(PlayerJoinEvent e) {
 
+    Bukkit.getLogger().info("JOIN EVENT WORKED");
+
     Player player = e.getPlayer();
 
     UUID id = player.getUniqueId();
