@@ -57,6 +57,12 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
                 this
         );
 
+        // STRENGTH ORB LISTENER
+        Bukkit.getPluginManager().registerEvents(
+                new StrengthOrbListener(this),
+                this
+        );
+
         // COMMANDS
         getCommand("strength").setExecutor(this);
         getCommand("withdraw").setExecutor(this);
@@ -91,7 +97,9 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
         player.sendMessage(
                 ChatColor.YELLOW +
                         "Weapon: " +
-                        MessageManager.formatWeapon(weapon.get(id))
+                        MessageManager.formatWeapon(
+                                weapon.get(id)
+                        )
         );
     }
 
@@ -116,7 +124,9 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
         p.sendMessage(
                 ChatColor.YELLOW +
                         "Weapon: " +
-                        MessageManager.formatWeapon(playerWeapon)
+                        MessageManager.formatWeapon(
+                                playerWeapon
+                        )
         );
     }
 
@@ -138,7 +148,8 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
         UUID id = player.getUniqueId();
 
         // ================= /strength =================
-        if (command.getName().equalsIgnoreCase("strength")) {
+        if (command.getName()
+                .equalsIgnoreCase("strength")) {
 
             sendStatus(player);
 
@@ -146,7 +157,8 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
         }
 
         // ================= /withdraw =================
-        if (command.getName().equalsIgnoreCase("withdraw")) {
+        if (command.getName()
+                .equalsIgnoreCase("withdraw")) {
 
             if (args.length == 0) {
 
@@ -162,7 +174,8 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
             try {
 
-                amount = Integer.parseInt(args[0]);
+                amount =
+                        Integer.parseInt(args[0]);
 
             } catch (Exception e) {
 
@@ -226,10 +239,16 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
         }
 
         NamespacedKey coreKey =
-                new NamespacedKey(this, "strength_core");
+                new NamespacedKey(
+                        this,
+                        "strength_core"
+                );
 
         ShapedRecipe coreRecipe =
-                new ShapedRecipe(coreKey, strengthCore);
+                new ShapedRecipe(
+                        coreKey,
+                        strengthCore
+                );
 
         coreRecipe.shape(
                 "EIE",
@@ -272,30 +291,46 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
         }
 
         NamespacedKey rerollKey =
-                new NamespacedKey(this, "reroll_book");
+                new NamespacedKey(
+                        this,
+                        "reroll_book"
+                );
 
         ShapedRecipe rerollRecipe =
-                new ShapedRecipe(rerollKey, rerollBook);
+                new ShapedRecipe(
+                        rerollKey,
+                        rerollBook
+                );
 
         rerollRecipe.shape(
-                "IGI",
-                "GDG",
-                "IGI"
-        );
-
-        rerollRecipe.setIngredient(
-                'I',
-                Material.IRON_BLOCK
-        );
-
-        rerollRecipe.setIngredient(
-                'G',
-                Material.GOLD_BLOCK
+                "DND",
+                "EWE",
+                "DTD"
         );
 
         rerollRecipe.setIngredient(
                 'D',
                 Material.DIAMOND_BLOCK
+        );
+
+        rerollRecipe.setIngredient(
+                'N',
+                Material.NETHERITE_HOE
+        );
+
+        rerollRecipe.setIngredient(
+                'W',
+                Material.WITHER_SKELETON_SKULL
+        );
+
+        rerollRecipe.setIngredient(
+                'E',
+                Material.ECHO_SHARD
+        );
+
+        rerollRecipe.setIngredient(
+                'T',
+                Material.TRIDENT
         );
 
         Bukkit.addRecipe(rerollRecipe);
