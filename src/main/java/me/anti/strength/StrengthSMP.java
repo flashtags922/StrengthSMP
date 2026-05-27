@@ -23,10 +23,14 @@ import java.util.UUID;
 
 public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor {
 
-    public final Map<UUID, Integer> strength = new HashMap<>();
-    public final Map<UUID, String> weapon = new HashMap<>();
+    public final Map<UUID, Integer> strength =
+            new HashMap<>();
 
-    private final Random random = new Random();
+    public final Map<UUID, String> weapon =
+            new HashMap<>();
+
+    private final Random random =
+            new Random();
 
     private final String[] weapons = {
             "SWORD",
@@ -42,10 +46,13 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
         saveDefaultConfig();
 
-        // MAIN EVENTS
-        Bukkit.getPluginManager().registerEvents(this, this);
+        // ================= MAIN =================
+        Bukkit.getPluginManager().registerEvents(
+                this,
+                this
+        );
 
-        // LISTENERS
+        // ================= LISTENERS =================
         Bukkit.getPluginManager().registerEvents(
                 new StrengthListener(this),
                 this
@@ -61,23 +68,33 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
                 this
         );
 
-        // COMMANDS
+        Bukkit.getPluginManager().registerEvents(
+                new UltimateListener(this),
+                this
+        );
+
+        // ================= COMMANDS =================
         getCommand("strength").setExecutor(this);
+
         getCommand("withdraw").setExecutor(this);
 
-        // RECIPES
+        // ================= RECIPES =================
         addRecipes();
 
-        getLogger().info("StrengthSMP Enabled!");
+        getLogger().info(
+                "StrengthSMP Enabled!"
+        );
     }
 
     // ================= JOIN =================
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
 
-        Player player = e.getPlayer();
+        Player player =
+                e.getPlayer();
 
-        UUID id = player.getUniqueId();
+        UUID id =
+                player.getUniqueId();
 
         strength.putIfAbsent(id, 3);
 
@@ -85,7 +102,9 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
             weapon.put(
                     id,
-                    weapons[random.nextInt(weapons.length)]
+                    weapons[random.nextInt(
+                            weapons.length
+                    )]
             );
         }
 
@@ -93,7 +112,8 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
                 ChatColor.GOLD +
                         "𝚂𝚝𝚛𝚎𝚗𝚐𝚝𝚑: " +
                         ChatColor.DARK_RED +
-                        "+" + strength.get(id)
+                        "+" +
+                        strength.get(id)
         );
 
         player.sendMessage(
@@ -108,19 +128,27 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
     // ================= STATUS =================
     private void sendStatus(Player p) {
 
-        UUID id = p.getUniqueId();
+        UUID id =
+                p.getUniqueId();
 
         int playerStrength =
-                strength.getOrDefault(id, 3);
+                strength.getOrDefault(
+                        id,
+                        3
+                );
 
         String playerWeapon =
-                weapon.getOrDefault(id, "NONE");
+                weapon.getOrDefault(
+                        id,
+                        "NONE"
+                );
 
         p.sendMessage(
                 ChatColor.GOLD +
                         "𝚂𝚝𝚛𝚎𝚗𝚐𝚝𝚑: " +
                         ChatColor.DARK_RED +
-                        "+" + playerStrength
+                        "+" +
+                        playerStrength
         );
 
         p.sendMessage(
@@ -145,13 +173,17 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
             return true;
         }
 
-        Player player = (Player) sender;
+        Player player =
+                (Player) sender;
 
-        UUID id = player.getUniqueId();
+        UUID id =
+                player.getUniqueId();
 
         // ================= /strength =================
         if (command.getName()
-                .equalsIgnoreCase("strength")) {
+                .equalsIgnoreCase(
+                        "strength"
+                )) {
 
             sendStatus(player);
 
@@ -160,7 +192,9 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
         // ================= /withdraw =================
         if (command.getName()
-                .equalsIgnoreCase("withdraw")) {
+                .equalsIgnoreCase(
+                        "withdraw"
+                )) {
 
             if (args.length == 0) {
 
@@ -177,7 +211,9 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
             try {
 
                 amount =
-                        Integer.parseInt(args[0]);
+                        Integer.parseInt(
+                                args[0]
+                        );
 
             } catch (Exception e) {
 
@@ -190,7 +226,10 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
             }
 
             int current =
-                    strength.getOrDefault(id, 3);
+                    strength.getOrDefault(
+                            id,
+                            3
+                    );
 
             current -= amount;
 
@@ -198,7 +237,10 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
                 current = -3;
             }
 
-            strength.put(id, current);
+            strength.put(
+                    id,
+                    current
+            );
 
             WithdrawManager.giveStrengthOrb(
                     player,
@@ -216,7 +258,9 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
         // ================= STRENGTH CORE =================
         ItemStack strengthCore =
-                new ItemStack(Material.NETHER_STAR);
+                new ItemStack(
+                        Material.NETHER_STAR
+                );
 
         ItemMeta coreMeta =
                 strengthCore.getItemMeta();
@@ -228,7 +272,9 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
                             "Strength Core"
             );
 
-            strengthCore.setItemMeta(coreMeta);
+            strengthCore.setItemMeta(
+                    coreMeta
+            );
         }
 
         NamespacedKey coreKey =
@@ -264,11 +310,15 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
                 Material.NETHER_STAR
         );
 
-        Bukkit.addRecipe(coreRecipe);
+        Bukkit.addRecipe(
+                coreRecipe
+        );
 
         // ================= REROLL BOOK =================
         ItemStack rerollBook =
-                new ItemStack(Material.BOOK);
+                new ItemStack(
+                        Material.BOOK
+                );
 
         ItemMeta bookMeta =
                 rerollBook.getItemMeta();
@@ -280,7 +330,9 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
                             "Reroll Book"
             );
 
-            rerollBook.setItemMeta(bookMeta);
+            rerollBook.setItemMeta(
+                    bookMeta
+            );
         }
 
         NamespacedKey rerollKey =
@@ -326,6 +378,8 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
                 Material.TRIDENT
         );
 
-        Bukkit.addRecipe(rerollRecipe);
+        Bukkit.addRecipe(
+                rerollRecipe
+        );
     }
 }
