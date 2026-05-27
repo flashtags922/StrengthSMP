@@ -87,14 +87,6 @@ public class StrengthOrbListener implements Listener {
         plugin.strength.put(id, current);
 
         item.setAmount(item.getAmount() - 1);
-
-        player.sendMessage(
-                ChatColor.YELLOW +
-                        "You redeemed "
-                        + ChatColor.RED +
-                        "+" + amount +
-                        ChatColor.YELLOW +
-                        " strength."
-        );
+    
     }
 }
