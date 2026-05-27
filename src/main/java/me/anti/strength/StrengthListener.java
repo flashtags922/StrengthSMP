@@ -17,6 +17,9 @@ public class StrengthListener implements Listener {
 
     private final Random random = new Random();
 
+    public static final java.util.Map<UUID, Boolean> axeUltimate =
+        new java.util.HashMap<>();
+
     public StrengthListener(StrengthSMP plugin) {
         this.plugin = plugin;
     }
