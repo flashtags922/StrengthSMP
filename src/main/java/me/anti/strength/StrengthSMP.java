@@ -42,22 +42,20 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
 
         saveDefaultConfig();
 
-        // JOIN EVENTS
+        // MAIN EVENTS
         Bukkit.getPluginManager().registerEvents(this, this);
 
-        // COMBAT LISTENER
+        // LISTENERS
         Bukkit.getPluginManager().registerEvents(
                 new StrengthListener(this),
                 this
         );
 
-        // REROLL LISTENER
         Bukkit.getPluginManager().registerEvents(
                 new RerollListener(this),
                 this
         );
 
-        // STRENGTH ORB LISTENER
         Bukkit.getPluginManager().registerEvents(
                 new StrengthOrbListener(this),
                 this
@@ -84,50 +82,55 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
         strength.putIfAbsent(id, 3);
 
         if (!weapon.containsKey(id)) {
-            weapon.put(id, weapons[random.nextInt(weapons.length)]);
+
+            weapon.put(
+                    id,
+                    weapons[random.nextInt(weapons.length)]
+            );
         }
 
-       player.sendMessage(
-        ChatColor.YELLOW +
-                "Strength: " +
-                ChatColor.RED +
-                "+" + strength.get(id)
-);
+        player.sendMessage(
+                ChatColor.GOLD +
+                        "𝚂𝚝𝚛𝚎𝚗𝚐𝚝𝚑: " +
+                        ChatColor.DARK_RED +
+                        "+" + strength.get(id)
+        );
 
-player.sendMessage(
-        ChatColor.YELLOW +
-                "Weapon: " +
-                MessageManager.formatWeapon(
-                        weapon.get(id)
-                )
-);
+        player.sendMessage(
+                ChatColor.GOLD +
+                        "𝚆𝚎𝚊𝚙𝚘𝚗: " +
+                        MessageManager.formatWeapon(
+                                weapon.get(id)
+                        )
+        );
+    }
 
     // ================= STATUS =================
-private void sendStatus(Player p) {
+    private void sendStatus(Player p) {
 
-    UUID id = p.getUniqueId();
+        UUID id = p.getUniqueId();
 
-    int playerStrength =
-            strength.getOrDefault(id, 3);
+        int playerStrength =
+                strength.getOrDefault(id, 3);
 
-    String playerWeapon =
-            weapon.getOrDefault(id, "NONE");
+        String playerWeapon =
+                weapon.getOrDefault(id, "NONE");
 
-    p.sendMessage(
-            ChatColor.GOLD +
-                    "𝚂𝚝𝚛𝚎𝚗𝚐𝚝𝚑: " +
-                    ChatColor.DARK_RED +
-                    "+" + playerStrength
-    );
+        p.sendMessage(
+                ChatColor.GOLD +
+                        "𝚂𝚝𝚛𝚎𝚗𝚐𝚝𝚑: " +
+                        ChatColor.DARK_RED +
+                        "+" + playerStrength
+        );
 
-    p.sendMessage(
-            ChatColor.GOLD +
-                    "𝚆𝚎𝚊𝚙𝚘𝚗: " +
-                    MessageManager.formatWeapon(
-                            playerWeapon
-                    )
-    );
-}
+        p.sendMessage(
+                ChatColor.GOLD +
+                        "𝚆𝚎𝚊𝚙𝚘𝚗: " +
+                        MessageManager.formatWeapon(
+                                playerWeapon
+                        )
+        );
+    }
 
     // ================= COMMANDS =================
     @Override
@@ -200,15 +203,6 @@ private void sendStatus(Player p) {
             WithdrawManager.giveStrengthOrb(
                     player,
                     amount
-            );
-
-            player.sendMessage(
-                    ChatColor.YELLOW +
-                            "You withdrew "
-                            + ChatColor.RED +
-                            amount +
-                            ChatColor.YELLOW +
-                            " strength."
             );
 
             return true;
