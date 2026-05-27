@@ -1,118 +1,186 @@
 package me.anti.strength;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.Material;
 import org.bukkit.util.Vector;
+
+import java.util.UUID;
 
 public class AbilityManager {
 
+    // ================= USE ABILITY =================
+    public static void useAbility(
+            StrengthSMP plugin,
+            Player player
+    ) {
+
+        UUID id = player.getUniqueId();
+
+        // MUST HAVE +5
+        if (plugin.strength.getOrDefault(id, 0) < 5) {
+            return;
+        }
+
+        String weapon =
+                plugin.weapon.get(id);
+
+        if (weapon == null) {
+            return;
+        }
+
+        switch (weapon.toUpperCase()) {
+
+            case "SWORD":
+                useSwordAbility(
+                        player
+                );
+                break;
+
+            case "AXE":
+                useAxeAbility(
+                        player
+                );
+                break;
+
+            case "BOW":
+                useBowAbility(
+                        player
+                );
+                break;
+
+            case "TRIDENT":
+                useTridentAbility(
+                        player
+                );
+                break;
+
+            case "CROSSBOW":
+                useCrossbowAbility(
+                        player
+                );
+                break;
+
+            case "SHIELD":
+                useShieldAbility(
+                        player
+                );
+                break;
+        }
+    }
+
     // ================= SWORD =================
-    public static void useSwordAbility(Player player) {
+    public static void useSwordAbility(
+            Player player
+    ) {
 
-        player.getWorld().spawnParticle(
-                Particle.SWEEP_ATTACK,
-                player.getLocation(),
-                20
+        ItemStack offhand =
+                new ItemStack(
+                        Material.DIAMOND_SWORD
+                );
+
+        player.getInventory()
+                .setItemInOffHand(
+                        offhand
+                );
+
+        player.sendMessage(
+                ChatColor.RED +
+                        "⚔ Ready!"
         );
 
-        player.playSound(
-                player.getLocation(),
-                Sound.ENTITY_PLAYER_ATTACK_SWEEP,
-                1,
-                1
-        );
+        Bukkit.getScheduler()
+                .runTaskLater(
+                        StrengthSMP.getPlugin(
+                                StrengthSMP.class
+                        ),
+                        () -> {
+
+                            player.getInventory()
+                                    .setItemInOffHand(
+                                            null
+                                    );
+
+                        },
+                        20L * 15
+                );
     }
 
     // ================= AXE =================
-    public static void useAxeAbility(Player player) {
+    public static void useAxeAbility(
+            Player player
+    ) {
 
-        player.getWorld().spawnParticle(
-                Particle.EXPLOSION,
-                player.getLocation(),
-                5
-        );
+        StrengthListener.axeUltimate
+                .put(
+                        player.getUniqueId(),
+                        true
+                );
 
-        player.playSound(
-                player.getLocation(),
-                Sound.ENTITY_GENERIC_EXPLODE,
-                1,
-                1
+        player.sendMessage(
+                ChatColor.DARK_RED +
+                        "🪓 Ready!"
         );
     }
 
     // ================= BOW =================
-    public static void useBowAbility(Player player) {
+    public static void useBowAbility(
+            Player player
+    ) {
 
-        player.getWorld().spawnParticle(
-                Particle.END_ROD,
-                player.getEyeLocation(),
-                30
-        );
-
-        player.playSound(
-                player.getLocation(),
-                Sound.ENTITY_ENDER_DRAGON_SHOOT,
-                1,
-                1
+        player.sendMessage(
+                ChatColor.GREEN +
+                        "🏹 Ready!"
         );
     }
 
     // ================= TRIDENT =================
-    public static void useTridentAbility(Player player) {
+    public static void useTridentAbility(
+            Player player
+    ) {
 
-        Vector vec =
+        Vector dash =
                 player.getLocation()
                         .getDirection()
                         .multiply(2);
 
-        player.setVelocity(vec);
+        player.setVelocity(dash);
 
-        player.getWorld().spawnParticle(
-                Particle.WATER_SPLASH,
-                player.getLocation(),
-                50
-        );
-
-        player.playSound(
-                player.getLocation(),
-                Sound.ITEM_TRIDENT_RIPTIDE_3,
-                1,
-                1
+        player.sendMessage(
+                ChatColor.AQUA +
+                        "🔱 Ready!"
         );
     }
 
     // ================= CROSSBOW =================
-    public static void useCrossbowAbility(Player player) {
+    public static void useCrossbowAbility(
+            Player player
+    ) {
 
-        player.getWorld().spawnParticle(
-                Particle.PORTAL,
-                player.getLocation(),
-                50
-        );
-
-        player.playSound(
-                player.getLocation(),
-                Sound.ITEM_CROSSBOW_SHOOT,
-                1,
-                1
+        player.sendMessage(
+                ChatColor.BLUE +
+                        "➹ Ready!"
         );
     }
 
     // ================= SHIELD =================
-    public static void useShieldAbility(Player player) {
+    public static void useShieldAbility(
+            Player player
+    ) {
 
-        player.getWorld().spawnParticle(
-                Particle.TOTEM_OF_UNDYING,
-                player.getLocation(),
-                20
+        player.setHealth(
+                Math.min(
+                        player.getHealth() + 6,
+                        player.getMaxHealth()
+                )
         );
 
-        player.playSound(
-                player.getLocation(),
-                Sound.ITEM_TOTEM_USE,
-                1,
-                1
+        player.sendMessage(
+                ChatColor.GREEN +
+                        "🛡 Ready!"
         );
     }
 }
