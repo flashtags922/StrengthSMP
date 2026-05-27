@@ -3,6 +3,7 @@ package me.anti.strength;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -15,7 +16,13 @@ public class UltimateListener implements Listener {
     public UltimateListener(StrengthSMP plugin) {
         this.plugin = plugin;
     }
+    
+Action action = e.getAction();
 
+if (action.name().contains("LEFT")) {
+    return;
+}
+    
     @EventHandler
     public void onUse(PlayerInteractEvent e) {
 
