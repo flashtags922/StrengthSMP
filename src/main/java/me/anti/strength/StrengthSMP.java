@@ -87,48 +87,47 @@ public class StrengthSMP extends JavaPlugin implements Listener, CommandExecutor
             weapon.put(id, weapons[random.nextInt(weapons.length)]);
         }
 
-        player.sendMessage(
-                ChatColor.YELLOW +
-                        "Strength: " +
-                        ChatColor.RED +
-                        "+" + strength.get(id)
-        );
+       player.sendMessage(
+        ChatColor.YELLOW +
+                "Strength: " +
+                ChatColor.RED +
+                "+" + strength.get(id)
+);
 
-        player.sendMessage(
-                ChatColor.YELLOW +
-                        "Weapon: " +
-                        MessageManager.formatWeapon(
-                                weapon.get(id)
-                        )
-        );
-    }
+player.sendMessage(
+        ChatColor.YELLOW +
+                "Weapon: " +
+                MessageManager.formatWeapon(
+                        weapon.get(id)
+                )
+);
 
     // ================= STATUS =================
-    private void sendStatus(Player p) {
+private void sendStatus(Player p) {
 
-        UUID id = p.getUniqueId();
+    UUID id = p.getUniqueId();
 
-        int playerStrength =
-                strength.getOrDefault(id, 3);
+    int playerStrength =
+            strength.getOrDefault(id, 3);
 
-        String playerWeapon =
-                weapon.getOrDefault(id, "NONE");
+    String playerWeapon =
+            weapon.getOrDefault(id, "NONE");
 
-        p.sendMessage(
-                ChatColor.YELLOW +
-                        "Strength: " +
-                        ChatColor.RED +
-                        "+" + playerStrength
-        );
+    p.sendMessage(
+            ChatColor.GOLD +
+                    "𝚂𝚝𝚛𝚎𝚗𝚐𝚝𝚑: " +
+                    ChatColor.DARK_RED +
+                    "+" + playerStrength
+    );
 
-        p.sendMessage(
-                ChatColor.YELLOW +
-                        "Weapon: " +
-                        MessageManager.formatWeapon(
-                                playerWeapon
-                        )
-        );
-    }
+    p.sendMessage(
+            ChatColor.GOLD +
+                    "𝚆𝚎𝚊𝚙𝚘𝚗: " +
+                    MessageManager.formatWeapon(
+                            playerWeapon
+                    )
+    );
+}
 
     // ================= COMMANDS =================
     @Override
