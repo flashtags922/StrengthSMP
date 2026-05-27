@@ -1,16 +1,11 @@
 package me.anti.strength;
 
-import org.bukkit.*;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class StrengthListener implements Listener {
@@ -21,194 +16,126 @@ public class StrengthListener implements Listener {
         this.plugin = plugin;
     }
 
-    private final Map<UUID, Integer> comboMap = new HashMap<>();
-    private final Map<UUID, Integer> axeCrits = new HashMap<>();
-    private final Map<UUID, Boolean> axeUltimate = new HashMap<>();
-
     // ================= HIT DETECTION =================
     @EventHandler
     public void onHit(EntityDamageByEntityEvent e) {
 
-        if (!(e.getDamager() instanceof Player)) return;
-        if (!(e.getEntity() instanceof Player)) return;
+        if (!(e.getDamager() instanceof Player)) {
+            return;
+        }
 
-        Player attacker = (Player) e.getDamager();
-        Player victim = (Player) e.getEntity();
+        if (!(e.getEntity() instanceof Player)) {
+            return;
+        }
 
-        UUID id = attacker.getUniqueId();
+        Player attacker =
+                (Player) e.getDamager();
 
-        String weapon = plugin.weapon.get(id);
+        Player victim =
+                (Player) e.getEntity();
 
-        if (weapon == null) return;
+        UUID id =
+                attacker.getUniqueId();
 
-        int combo = comboMap.getOrDefault(id, 0) + 1;
-        comboMap.put(id, combo);
+        String weapon =
+                plugin.weapon.getOrDefault(
+                        id,
+                        "NONE"
+                );
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            comboMap.put(id, 0);
-        }, 40L);
+        int strength =
+                plugin.strength.getOrDefault(
+                        id,
+                        0
+                );
 
-        // ================= SWORD =================
-        if (weapon.equals("SWORD")) {
+        // ================= COMBO =================
+        ComboManager.addHit(
+                plugin,
+                attacker
+        );
 
-            // passive every 3 hits crit
-            if (plugin.strength.get(id) >= 3) {
+        // ================= +3 PASSIVES =================
+        if (strength >= 3) {
+
+            // ================= SWORD =================
+            if (weapon.equalsIgnoreCase("SWORD")) {
+
+                int combo =
+                        ComboManager.combo
+                                .getOrDefault(id, 0);
 
                 if (combo % 3 == 0) {
-                    e.setDamage(e.getDamage() * 1.5);
 
-                    attacker.sendMessage(ChatColor.RED + "⚔ CRITICAL HIT");
+                    e.setDamage(
+                            e.getDamage() * 1.5
+                    );
+
+                    attacker.getWorld()
+                            .spawnParticle(
+                                    Particle.CRIT,
+                                    victim.getLocation(),
+                                    15
+                            );
                 }
             }
 
-            // ultimate ready
-            if (plugin.strength.get(id) >= 5) {
+            // ================= AXE =================
+            if (weapon.equalsIgnoreCase("AXE")) {
+
+                boolean crit =
+                        attacker.getFallDistance() > 0
+                                && !attacker.isOnGround();
+
+                if (crit) {
+
+                    victim.getWorld()
+                            .spawnParticle(
+                                    Particle.CRIT,
+                                    victim.getLocation(),
+                                    20
+                            );
+                }
+            }
+
+            // ================= BOW =================
+            if (weapon.equalsIgnoreCase("BOW")) {
+
+                int combo =
+                        ComboManager.combo
+                                .getOrDefault(id, 0);
+
+                if (combo % 3 == 0) {
+
+                    e.setDamage(
+                            e.getDamage() * 2
+                    );
+                }
+            }
+
+            // ================= TRIDENT =================
+            if (weapon.equalsIgnoreCase("TRIDENT")) {
+
+                victim.getWorld()
+                        .strikeLightningEffect(
+                                victim.getLocation()
+                        );
+            }
+
+            // ================= CROSSBOW =================
+            if (weapon.equalsIgnoreCase("CROSSBOW")) {
+
+                int combo =
+                        ComboManager.combo
+                                .getOrDefault(id, 0);
 
                 if (combo % 5 == 0) {
-                    attacker.sendMessage(ChatColor.RED + "⚔ Ready");
+
+                    victim.teleport(
+                            attacker.getLocation()
+                    );
                 }
             }
         }
-
-        // ================= AXE =================
-        if (weapon.equals("AXE")) {
-
-            boolean crit = attacker.getFallDistance() > 0 && !attacker.isOnGround();
-
-            if (crit) {
-
-                int crits = axeCrits.getOrDefault(id, 0) + 1;
-                axeCrits.put(id, crits);
-
-                attacker.sendMessage(ChatColor.GOLD + "🪓 Crit " + crits + "/5");
-
-                // stun after 5 crits
-                if (crits >= 5) {
-
-                    axeCrits.put(id, 0);
-
-                    stunPlayer(victim);
-
-                    attacker.sendMessage(ChatColor.DARK_RED + "🪓 Ready");
-                }
-            }
-
-            // axe ultimate
-            if (axeUltimate.getOrDefault(id, false)) {
-
-                e.setDamage(10);
-
-                axeUltimate.put(id, false);
-
-                attacker.sendMessage(ChatColor.RED + "BERSERKER HIT!");
-            }
-        }
-
-        // ================= BOW =================
-        if (weapon.equals("BOW")) {
-
-            if (combo % 3 == 0) {
-
-                e.setDamage(e.getDamage() * 2);
-
-                attacker.sendMessage(ChatColor.GREEN + "🏹 Double Damage");
-            }
-
-            if (combo % 10 == 0) {
-
-                attacker.sendMessage(ChatColor.GREEN + "🏹 Ready");
-            }
-        }
-
-        // ================= TRIDENT =================
-        if (weapon.equals("TRIDENT")) {
-
-            victim.getWorld().strikeLightningEffect(victim.getLocation());
-
-            attacker.sendMessage(ChatColor.AQUA + "🔱 Lightning Strike");
-
-            if (combo % 5 == 0) {
-
-                attacker.sendMessage(ChatColor.AQUA + "🔱 Ready");
-            }
-        }
-
-        // ================= CROSSBOW =================
-        if (weapon.equals("CROSSBOW")) {
-
-            if (combo % 5 == 0) {
-
-                victim.teleport(attacker.getLocation());
-
-                attacker.sendMessage(ChatColor.BLUE + "➹ Pulled Player");
-            }
-
-            if (combo % 10 == 0) {
-
-                e.setDamage(e.getDamage() * 4);
-
-                attacker.sendMessage(ChatColor.BLUE + "➹ Ready");
-            }
-        }
-
-        // ================= SHIELD =================
-        if (weapon.equals("SHIELD")) {
-
-            attacker.addPotionEffect(new PotionEffect(
-                    PotionEffectType.RESISTANCE,
-                    100,
-                    0
-            ));
-
-            if (combo % 5 == 0) {
-
-                attacker.sendMessage(ChatColor.GRAY + "🛡 Ready");
-            }
-        }
-    }
-
-    // ================= STUN =================
-    private void stunPlayer(Player p) {
-
-        new BukkitRunnable() {
-
-            int ticks = 0;
-
-            @Override
-            public void run() {
-
-                if (ticks >= 20) {
-                    cancel();
-                    return;
-                }
-
-                ticks++;
-
-                p.setVelocity(new org.bukkit.util.Vector(0, 0, 0));
-
-                p.addPotionEffect(new PotionEffect(
-                        PotionEffectType.SLOWNESS,
-                        5,
-                        255,
-                        false,
-                        false
-                ));
-
-                p.addPotionEffect(new PotionEffect(
-                        PotionEffectType.NAUSEA,
-                        5,
-                        1,
-                        false,
-                        false
-                ));
-
-                Location loc = p.getLocation();
-
-                loc.setYaw(loc.getYaw() + 10);
-
-                p.teleport(loc);
-            }
-
-        }.runTaskTimer(plugin, 0L, 1L);
     }
 }
