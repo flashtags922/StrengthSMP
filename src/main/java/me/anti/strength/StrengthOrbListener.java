@@ -28,7 +28,7 @@ public class StrengthOrbListener implements Listener {
                 player.getInventory()
                         .getItemInMainHand();
 
-       if (item.getType() != Material.GHAST_TEAR) {
+        if (item.getType() != Material.GHAST_TEAR) {
             return;
         }
 
@@ -40,11 +40,11 @@ public class StrengthOrbListener implements Listener {
             return;
         }
 
-       if (!item.getItemMeta()
-        .getDisplayName()
-        .contains("Strength")) {
-    return;
-} 
+        if (!item.getItemMeta()
+                .getDisplayName()
+                .contains("Strength")) {
+            return;
+        }
 
         List<String> lore =
                 item.getItemMeta().getLore();
@@ -87,6 +87,5 @@ public class StrengthOrbListener implements Listener {
         plugin.strength.put(id, current);
 
         item.setAmount(item.getAmount() - 1);
-    
     }
 }
