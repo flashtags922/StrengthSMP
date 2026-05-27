@@ -40,11 +40,11 @@ public class StrengthOrbListener implements Listener {
             return;
         }
 
-        if (!item.getItemMeta()
-                .getDisplayName()
-                .contains("Strength")
-            return;
-        }
+       if (!item.getItemMeta()
+        .getDisplayName()
+        .contains("Strength")) {
+    return;
+} 
 
         List<String> lore =
                 item.getItemMeta().getLore();
