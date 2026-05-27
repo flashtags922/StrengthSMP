@@ -8,23 +8,32 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Arrays;
+
 public class WithdrawManager {
 
-    public static void giveStrengthOrb(Player player, int amount) {
+    public static void giveStrengthOrb(
+            Player player,
+            int amount
+    ) {
 
-        ItemStack orb = new ItemStack(Material.NETHER_STAR);
+        ItemStack orb =
+                new ItemStack(Material.GHAST_TEAR);
 
-        ItemMeta meta = orb.getItemMeta();
+        ItemMeta meta =
+                orb.getItemMeta();
 
         if (meta != null) {
 
             meta.setDisplayName(
-                    ChatColor.RED + "✦ Strength Orb"
+                    ChatColor.RED +
+                            "Strength"
             );
 
-            meta.setLore(java.util.Arrays.asList(
-                    ChatColor.GRAY + "Strength Amount: "
-                            + ChatColor.RED + "+" + amount
+            meta.setLore(Arrays.asList(
+                    ChatColor.GRAY +
+                            "Strength Amount: +" +
+                            amount
             ));
 
             meta.addEnchant(
