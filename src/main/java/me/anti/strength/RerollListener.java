@@ -15,8 +15,7 @@ public class RerollListener implements Listener {
 
     private final StrengthSMP plugin;
 
-    private final Random random =
-            new Random();
+    private final Random random = new Random();
 
     private final String[] weapons = {
             "SWORD",
@@ -27,66 +26,73 @@ public class RerollListener implements Listener {
             "SHIELD"
     };
 
-    public RerollListener(
-            StrengthSMP plugin
-    ) {
+    public RerollListener(StrengthSMP plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler
-    public void onUse(
-            PlayerInteractEvent e
-    ) {
+    public void onUse(PlayerInteractEvent e) {
 
-        Player player =
-                e.getPlayer();
+        Player player = e.getPlayer();
 
         ItemStack item =
                 player.getInventory()
                         .getItemInMainHand();
 
+        // MUST BE BOOK
         if (item.getType() != Material.BOOK) {
             return;
         }
 
+        // MUST HAVE META
         if (!item.hasItemMeta()) {
             return;
         }
 
-        if (!item.getItemMeta()
-                .hasDisplayName()) {
+        // MUST HAVE NAME
+        if (!item.getItemMeta().hasDisplayName()) {
             return;
         }
 
+        // MUST BE REROLL BOOK
         if (!ChatColor.stripColor(
-                item.getItemMeta()
-                        .getDisplayName()
-        ).equalsIgnoreCase(
-                "Reroll Book"
-        )) {
+                item.getItemMeta().getDisplayName()
+        ).equalsIgnoreCase("Reroll Book")) {
             return;
         }
 
-        UUID id =
-                player.getUniqueId();
+        UUID id = player.getUniqueId();
+
+        String oldWeapon =
+                plugin.weapon.getOrDefault(
+                        id,
+                        "NONE"
+                );
 
         String newWeapon =
                 weapons[random.nextInt(
                         weapons.length
                 )];
 
+        // PREVENT SAME WEAPON
+        while (newWeapon.equalsIgnoreCase(oldWeapon)) {
+
+            newWeapon =
+                    weapons[random.nextInt(
+                            weapons.length
+                    )];
+        }
+
         plugin.weapon.put(
                 id,
                 newWeapon
         );
 
-        item.setAmount(
-                item.getAmount() - 1
-        );
+        item.setAmount(item.getAmount() - 1);
 
         player.sendMessage(
-                ChatColor.GOLD +
-                        "𝚆𝚎𝚊𝚙𝚘𝚗: " +
+                ChatColor.GREEN +
+                        "New Weapon: " +
                         MessageManager.formatWeapon(
                                 newWeapon
                         )
