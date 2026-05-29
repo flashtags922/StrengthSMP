@@ -2,10 +2,9 @@ package me.anti.strength;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Particle;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.Material;
 import org.bukkit.util.Vector;
 
 import java.util.UUID;
@@ -25,8 +24,7 @@ public class AbilityManager {
             return;
         }
 
-        String weapon =
-                plugin.weapon.get(id);
+        String weapon = plugin.weapon.get(id);
 
         if (weapon == null) {
             return;
@@ -35,39 +33,27 @@ public class AbilityManager {
         switch (weapon.toUpperCase()) {
 
             case "SWORD":
-                useSwordAbility(
-                        player
-                );
+                useSwordAbility(player);
                 break;
 
             case "AXE":
-                useAxeAbility(
-                        player
-                );
+                useAxeAbility(player);
                 break;
 
             case "BOW":
-                useBowAbility(
-                        player
-                );
+                useBowAbility(player);
                 break;
 
             case "TRIDENT":
-                useTridentAbility(
-                        player
-                );
+                useTridentAbility(player);
                 break;
 
             case "CROSSBOW":
-                useCrossbowAbility(
-                        player
-                );
+                useCrossbowAbility(player);
                 break;
 
             case "SHIELD":
-                useShieldAbility(
-                        player
-                );
+                useShieldAbility(player);
                 break;
         }
     }
@@ -89,7 +75,7 @@ public class AbilityManager {
 
         player.sendMessage(
                 ChatColor.RED +
-                        "⚔ Ready!"
+                        "⚔ Sword Ability Activated!"
         );
 
         Bukkit.getScheduler()
@@ -114,15 +100,16 @@ public class AbilityManager {
             Player player
     ) {
 
-        StrengthListener.axeUltimate
-                .put(
-                        player.getUniqueId(),
-                        true
-                );
-
         player.sendMessage(
                 ChatColor.DARK_RED +
-                        "🪓 Ready!"
+                        "🪓 Axe Ability Activated!"
+        );
+
+        // SIMPLE SAFE EFFECT
+        player.setVelocity(
+                player.getLocation()
+                        .getDirection()
+                        .multiply(1.5)
         );
     }
 
@@ -133,7 +120,7 @@ public class AbilityManager {
 
         player.sendMessage(
                 ChatColor.GREEN +
-                        "🏹 Ready!"
+                        "🏹 Bow Ability Activated!"
         );
     }
 
@@ -151,7 +138,7 @@ public class AbilityManager {
 
         player.sendMessage(
                 ChatColor.AQUA +
-                        "🔱 Ready!"
+                        "🔱 Trident Ability Activated!"
         );
     }
 
@@ -162,7 +149,7 @@ public class AbilityManager {
 
         player.sendMessage(
                 ChatColor.BLUE +
-                        "➹ Ready!"
+                        "➹ Crossbow Ability Activated!"
         );
     }
 
@@ -180,7 +167,7 @@ public class AbilityManager {
 
         player.sendMessage(
                 ChatColor.GREEN +
-                        "🛡 Ready!"
+                        "🛡 Shield Ability Activated!"
         );
     }
 }
