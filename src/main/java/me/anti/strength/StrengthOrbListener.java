@@ -28,21 +28,26 @@ public class StrengthOrbListener implements Listener {
                 player.getInventory()
                         .getItemInMainHand();
 
+        // MUST BE GHAST TEAR
         if (item.getType() != Material.GHAST_TEAR) {
             return;
         }
 
+        // MUST HAVE META
         if (!item.hasItemMeta()) {
             return;
         }
 
+        // MUST HAVE NAME
         if (!item.getItemMeta().hasDisplayName()) {
             return;
         }
 
+        // MUST CONTAIN STRENGTH
         if (!item.getItemMeta()
                 .getDisplayName()
                 .contains("Strength")) {
+
             return;
         }
 
@@ -53,9 +58,10 @@ public class StrengthOrbListener implements Listener {
             return;
         }
 
-        String line = ChatColor.stripColor(
-                lore.get(0)
-        );
+        String line =
+                ChatColor.stripColor(
+                        lore.get(0)
+                );
 
         line = line.replace(
                 "Strength Amount: +",
@@ -66,17 +72,22 @@ public class StrengthOrbListener implements Listener {
 
         try {
 
-            amount = Integer.parseInt(line);
+            amount =
+                    Integer.parseInt(line);
 
         } catch (Exception ex) {
 
             return;
         }
 
-        UUID id = player.getUniqueId();
+        UUID id =
+                player.getUniqueId();
 
         int current =
-                plugin.strength.getOrDefault(id, 0);
+                plugin.strength.getOrDefault(
+                        id,
+                        0
+                );
 
         current += amount;
 
@@ -84,8 +95,19 @@ public class StrengthOrbListener implements Listener {
             current = 5;
         }
 
-        plugin.strength.put(id, current);
+        plugin.strength.put(
+                id,
+                current
+        );
 
-        item.setAmount(item.getAmount() - 1);
+        item.setAmount(
+                item.getAmount() - 1
+        );
+
+        player.sendMessage(
+                ChatColor.RED +
+                        "✦ Strength increased to +" +
+                        current
+        );
     }
 }
