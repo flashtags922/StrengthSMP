@@ -23,7 +23,8 @@ public class UltimateListener implements Listener {
         Action action = e.getAction();
 
         // ONLY RIGHT CLICK
-        if (action.name().contains("LEFT")) {
+        if (action != Action.RIGHT_CLICK_AIR &&
+                action != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
 
@@ -36,16 +37,15 @@ public class UltimateListener implements Listener {
             return;
         }
 
-        String weapon =
-                plugin.weapon.getOrDefault(
-                        id,
-                        "NONE"
-                );
+        Material hand = player
+                .getInventory()
+                .getItemInMainHand()
+                .getType();
 
-        Material hand =
-                player.getInventory()
-                        .getItemInMainHand()
-                        .getType();
+        String weapon = plugin.weapon.getOrDefault(
+                id,
+                "NONE"
+        );
 
         // ================= SWORD =================
         if (weapon.equalsIgnoreCase("SWORD")) {
@@ -55,6 +55,9 @@ public class UltimateListener implements Listener {
             }
 
             AbilityManager.useSwordAbility(player);
+
+            ComboManager.resetCombo(player);
+            return;
         }
 
         // ================= AXE =================
@@ -65,6 +68,9 @@ public class UltimateListener implements Listener {
             }
 
             AbilityManager.useAxeAbility(player);
+
+            ComboManager.resetCombo(player);
+            return;
         }
 
         // ================= BOW =================
@@ -75,6 +81,9 @@ public class UltimateListener implements Listener {
             }
 
             AbilityManager.useBowAbility(player);
+
+            ComboManager.resetCombo(player);
+            return;
         }
 
         // ================= TRIDENT =================
@@ -85,6 +94,9 @@ public class UltimateListener implements Listener {
             }
 
             AbilityManager.useTridentAbility(player);
+
+            ComboManager.resetCombo(player);
+            return;
         }
 
         // ================= CROSSBOW =================
@@ -95,6 +107,9 @@ public class UltimateListener implements Listener {
             }
 
             AbilityManager.useCrossbowAbility(player);
+
+            ComboManager.resetCombo(player);
+            return;
         }
 
         // ================= SHIELD =================
@@ -105,9 +120,8 @@ public class UltimateListener implements Listener {
             }
 
             AbilityManager.useShieldAbility(player);
-        }
 
-        // RESET AFTER USE
-        ComboManager.resetCombo(player);
+            ComboManager.resetCombo(player);
+        }
     }
 }
